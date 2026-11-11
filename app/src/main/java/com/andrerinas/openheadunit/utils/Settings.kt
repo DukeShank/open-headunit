@@ -308,6 +308,17 @@ class Settings(private val context: Context) {
             prefs.edit().putBoolean("locked-gestures", value).apply()
         }
 
+    /**
+     * Seconds without touch after which an unlocked projection locks the unit again; 0 is off.
+     * Needs "Show over lock screen" and the screen-off device admin grant; see
+     * [com.andrerinas.openheadunit.input.IdleRelockPolicy].
+     */
+    var relockIdleSeconds: Int
+        get() = prefs.getInt("relock-idle-seconds", 0)
+        set(value) {
+            prefs.edit().putInt("relock-idle-seconds", value).apply()
+        }
+
     var nightMode: NightMode
         get() {
             val value = prefs.getInt("night-mode", 0)
