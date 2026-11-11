@@ -319,6 +319,24 @@ class Settings(private val context: Context) {
             prefs.edit().putInt("relock-idle-seconds", value).apply()
         }
 
+    /**
+     * Lets a locked unit shown over the lock screen show the night overlay (text) in place of the
+     * map, switched by a two-finger swipe down or up; see
+     * [com.andrerinas.openheadunit.input.LockedViewPolicy]. Off by default.
+     */
+    var lockedTextView: Boolean
+        get() = prefs.getBoolean("locked-text-view", false)
+        set(value) {
+            prefs.edit().putBoolean("locked-text-view", value).apply()
+        }
+
+    /** The view a locked unit used last with [lockedTextView] on: true for text, false for the map. */
+    var lockedTextChosen: Boolean
+        get() = prefs.getBoolean("locked-text-chosen", true)
+        set(value) {
+            prefs.edit().putBoolean("locked-text-chosen", value).apply()
+        }
+
     var nightMode: NightMode
         get() {
             val value = prefs.getInt("night-mode", 0)

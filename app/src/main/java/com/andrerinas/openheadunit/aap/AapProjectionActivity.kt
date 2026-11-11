@@ -53,6 +53,7 @@ import com.andrerinas.openheadunit.input.LockedInputPolicy
 import com.andrerinas.openheadunit.input.LockedGestureTracker
 import com.andrerinas.openheadunit.input.LockedGestureFeed
 import com.andrerinas.openheadunit.input.IdleRelockPolicy
+import com.andrerinas.openheadunit.input.LockedViewPolicy
 import com.andrerinas.openheadunit.utils.BluetoothHelper
 import com.andrerinas.openheadunit.utils.CarLauncherManager
 import com.andrerinas.openheadunit.connection.self.SelfModeCallRaisePolicy
@@ -109,6 +110,9 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     private var lastLockedHintMs = 0L
     /** Follows the current touch on a locked unit when "Gestures while locked" is on. */
     private var lockedGesture: LockedGestureTracker? = null
+
+    /** True while the night overlay is up because the locked unit shows its text view. */
+    private var lockedViewOwnsOverlay = false
 
     // "Lock again when idle": the countdown, and the screen-on that follows the lock. Its own
     // handler, because the wake has to outlive the pause that the dark screen brings.
@@ -1342,6 +1346,8 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         placeDimmer()
         // The overlay is built hidden, so one lost to a recreation counts as closed.
         commManager.dimState.resumeAfterOverlay()
+        // A screen rebuilt on a locked unit goes back to the locked unit's view.
+        syncLockedView()
         overlayView.requestFocus()
         setFullscreen() // Call setFullscreen here as well
 
@@ -1564,10 +1570,15 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         val enabled = settings.showOverLockScreen
         val deviceLocked = if (LockedInputPolicy.needsLockState(enabled, screenOff)) isDeviceLockedNow() else null
         val engage = LockedInputPolicy.shouldEngage(enabled, deviceLocked, screenOff)
-        if (engage == LockedInputPolicy.engaged) return
+        if (engage == LockedInputPolicy.engaged) {
+            // A rebuilt screen starts without the overlay while the hold is still on.
+            syncLockedView()
+            return
+        }
         LockedInputPolicy.engaged = engage
         AppLog.i("AapProjectionActivity: locked-unit input hold ${if (engage) "on" else "off"} ($reason)")
         if (!engage) {
+            syncLockedView()
             armIdleRelock()
             return
         }
@@ -1580,6 +1591,37 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         // Straight to the transport, past the keymap: this is Android Auto's own map key.
         commManager.send(LockedInputPolicy.KEYCODE_AA_NAVIGATION, true)
         commManager.send(LockedInputPolicy.KEYCODE_AA_NAVIGATION, false)
+        syncLockedView()
+    }
+
+    /**
+     * Puts the night overlay up or takes it away so the locked unit shows the view "Text view
+     * while locked" asks for. Safe to call at any time; it does nothing before the overlay exists.
+     */
+    private fun syncLockedView() {
+        val overlay = nightOverlay ?: return
+        val visible = overlay.visibility == View.VISIBLE
+        if (!visible) lockedViewOwnsOverlay = false
+        when (LockedViewPolicy.decide(LockedInputPolicy.engaged, settings.lockedTextView,
+            settings.lockedTextChosen, visible, lockedViewOwnsOverlay)) {
+            LockedViewPolicy.Step.SHOW_TEXT -> {
+                showNightOverlay()
+                lockedViewOwnsOverlay = true
+                AppLog.i("AapProjectionActivity: locked unit shows the text view")
+            }
+            LockedViewPolicy.Step.HIDE_TEXT -> {
+                overlay.hide()
+                lockedViewOwnsOverlay = false
+                AppLog.i("AapProjectionActivity: locked unit shows the picture")
+            }
+            LockedViewPolicy.Step.KEEP -> Unit
+        }
+    }
+
+    /** A swipe on the locked unit chose the text view or the map; the choice is kept for the next lock. */
+    private fun chooseLockedView(text: Boolean) {
+        settings.lockedTextChosen = text
+        syncLockedView()
     }
 
     /** Restarts the countdown of "Lock again when idle", or stops it when it should not run. */
@@ -1656,10 +1698,12 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
 
     /**
      * A touch on a locked unit. Nothing of it goes to the phone. With "Gestures while locked" on,
-     * two fingers can swipe or tap for the media keys; one finger alone gets the "Locked" note.
+     * two fingers can swipe or tap for the media keys; with "Text view while locked" on, they can
+     * swipe down or up to change the view. One finger alone gets the "Locked" note.
      */
     private fun onLockedTouch(ev: MotionEvent) {
-        if (!LockedInputPolicy.mediaKeys) {
+        val textView = settings.lockedTextView
+        if (!LockedInputPolicy.mediaKeys && !textView) {
             lockedGesture = null
             if (ev.actionMasked == MotionEvent.ACTION_DOWN) showLockedHint()
             return
@@ -1674,24 +1718,25 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             MotionEvent.ACTION_CANCEL -> lockedGesture = null
             else -> {
                 // The feed reads the fingers; this screen reads coordinates only in the overlay's frame.
-                val tracker = lockedGesture
-                val gesture = if (tracker != null) LockedGestureFeed.feed(tracker, ev) else null
-                if (gesture != null) performLockedGesture(gesture)
+                val tracker = lockedGesture ?: return
+                val gesture = LockedGestureFeed.feed(tracker, ev) ?: return
+                if (gesture.switchesView) {
+                    if (textView) chooseLockedView(text = gesture == LockedGestureTracker.Gesture.TEXT_VIEW)
+                } else if (LockedInputPolicy.mediaKeys) {
+                    performLockedGesture(gesture)
+                }
             }
         }
     }
 
     /** Sends the media key of a locked-unit gesture and names it in a short note. */
     private fun performLockedGesture(gesture: LockedGestureTracker.Gesture) {
-        val keyCode = when (gesture) {
-            LockedGestureTracker.Gesture.NEXT_TRACK -> KeyEvent.KEYCODE_MEDIA_NEXT
-            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> KeyEvent.KEYCODE_MEDIA_PREVIOUS
-            LockedGestureTracker.Gesture.PLAY_PAUSE -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-        }
-        val label = when (gesture) {
-            LockedGestureTracker.Gesture.NEXT_TRACK -> R.string.key_media_next
-            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> R.string.key_media_prev
-            LockedGestureTracker.Gesture.PLAY_PAUSE -> R.string.key_media_play_pause
+        val (keyCode, label) = when (gesture) {
+            LockedGestureTracker.Gesture.NEXT_TRACK -> KeyEvent.KEYCODE_MEDIA_NEXT to R.string.key_media_next
+            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> KeyEvent.KEYCODE_MEDIA_PREVIOUS to R.string.key_media_prev
+            LockedGestureTracker.Gesture.PLAY_PAUSE -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE to R.string.key_media_play_pause
+            // The view gestures are no keys; onLockedTouch handles them.
+            LockedGestureTracker.Gesture.TEXT_VIEW, LockedGestureTracker.Gesture.MAP_VIEW -> return
         }
         AppLog.i("AapProjectionActivity: locked-unit gesture $gesture")
         // Straight to the transport, past the keymap: a gesture is not a learned hardware key.
@@ -2619,20 +2664,25 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             true
         }
         GestureOutcomePolicy.Outcome.ShowOverlay -> {
-            commManager.dimState.suspendForOverlay()
-            nightOverlay?.apply {
-                applyOptions(NightOverlayOptions(
-                    textSize = settings.nightOverlayTextSize,
-                    background = settings.nightOverlayBackground,
-                    showClock = settings.nightOverlayShowClock,
-                    showNavigation = settings.nightOverlayShowNavigation,
-                    showTrack = settings.nightOverlayShowTrack
-                ))
-                render(App.provide(this@AapProjectionActivity).nightOverlayState.content.value)
-                scaleX = if (settings.hudMirroring) -1f else 1f
-                show()
-            }
+            showNightOverlay()
             true
+        }
+    }
+
+    /** Puts the night overlay up with the current settings; a gesture and the locked text view share it. */
+    private fun showNightOverlay() {
+        commManager.dimState.suspendForOverlay()
+        nightOverlay?.apply {
+            applyOptions(NightOverlayOptions(
+                textSize = settings.nightOverlayTextSize,
+                background = settings.nightOverlayBackground,
+                showClock = settings.nightOverlayShowClock,
+                showNavigation = settings.nightOverlayShowNavigation,
+                showTrack = settings.nightOverlayShowTrack
+            ))
+            render(App.provide(this@AapProjectionActivity).nightOverlayState.content.value)
+            scaleX = if (settings.hudMirroring) -1f else 1f
+            show()
         }
     }
 
