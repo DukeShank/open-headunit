@@ -51,6 +51,7 @@ import com.andrerinas.openheadunit.utils.AppLog
 import com.andrerinas.openheadunit.utils.ScreenPower
 import com.andrerinas.openheadunit.input.LockedInputPolicy
 import com.andrerinas.openheadunit.input.LockedGestureTracker
+import com.andrerinas.openheadunit.input.LockedGestureFeed
 import com.andrerinas.openheadunit.input.IdleRelockPolicy
 import com.andrerinas.openheadunit.utils.BluetoothHelper
 import com.andrerinas.openheadunit.utils.CarLauncherManager
@@ -1663,29 +1664,20 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             if (ev.actionMasked == MotionEvent.ACTION_DOWN) showLockedHint()
             return
         }
-        val twoDown = ev.pointerCount == 2
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN ->
                 lockedGesture = LockedGestureTracker(resources.displayMetrics.density)
-            MotionEvent.ACTION_POINTER_DOWN ->
-                if (twoDown) {
-                    lockedGesture?.onSecondDown(ev.getX(0), ev.getY(0), ev.getX(1), ev.getY(1), ev.eventTime)
-                } else {
-                    lockedGesture?.spoil()
-                }
-            MotionEvent.ACTION_MOVE ->
-                if (twoDown) lockedGesture?.onMove(ev.getX(0), ev.getY(0), ev.getX(1), ev.getY(1))
-            MotionEvent.ACTION_POINTER_UP ->
-                if (twoDown) {
-                    lockedGesture?.onMove(ev.getX(0), ev.getY(0), ev.getX(1), ev.getY(1))
-                    val gesture = lockedGesture?.onLift(ev.eventTime)
-                    if (gesture != null) performLockedGesture(gesture)
-                }
             MotionEvent.ACTION_UP -> {
                 if (lockedGesture?.sawSecondFinger != true) showLockedHint()
                 lockedGesture = null
             }
             MotionEvent.ACTION_CANCEL -> lockedGesture = null
+            else -> {
+                // The feed reads the fingers; this screen reads coordinates only in the overlay's frame.
+                val tracker = lockedGesture
+                val gesture = if (tracker != null) LockedGestureFeed.feed(tracker, ev) else null
+                if (gesture != null) performLockedGesture(gesture)
+            }
         }
     }
 
