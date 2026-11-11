@@ -1300,6 +1300,9 @@
     <string name="show_over_lock_screen_summary">O mapa e as rotas continuam visíveis bloqueado. Toques e botões não fazem nada.</string>
     <string name="show_over_lock_screen_help">Mostra a imagem do Android Auto sobre a tela de bloqueio, para ler o mapa e as rotas sem desbloquear. Enquanto esta unidade estiver bloqueada, nada chega ao celular: toques, botões, o controle giratório e o botão de voz são retidos, e o mapa é trazido para a frente. Pressione Voltar para desbloquear com seu PIN, padrão ou senha; depois tudo funciona normalmente. Música, chamadas e o assistente de voz no próprio celular não são afetados.</string>
     <string name="show_over_lock_screen_locked_toast">Bloqueado: só o mapa. Pressione Voltar para desbloquear.</string>
+    <string name="locked_gestures">Gestos com bloqueio</string>
+    <string name="locked_gestures_summary">Deslizar com dois dedos: faixa seguinte ou anterior. Tocar com dois dedos: reproduzir ou pausar.</string>
+    <string name="locked_gestures_help">Enquanto esta unidade estiver bloqueada, deslize para a direita com dois dedos para a próxima faixa, para a esquerda para a anterior, ou toque com dois dedos para reproduzir ou pausar. Os gestos são enviados ao celular como teclas de mídia, que só podem controlar a reprodução; os toques continuam sem chegar ao Android Auto. Um toque com um dedo não faz nada.</string>
     <string name="audio_stream_settings">Fluxos de áudio</string>
     <string name="audio_stream_settings_description">Escolha o fluxo do sistema em que cada canal do Android Auto toca.</string>
     <string name="audio_stream_settings_info">O Android Auto envia áudio em três canais: Mídia, Orientação e Sons do sistema. Cada um chega à central multimídia por um fluxo do sistema, e o fluxo escolhido define a tecla de volume que ele segue e, em muitas centrais, se o amplificador é ativado para ele. Use o botão do alto-falante para ouvir um tom de teste no fluxo antes de salvar.</string>

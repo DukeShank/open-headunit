@@ -96,6 +96,7 @@ class SettingsPendingCopy {
     var autoKillOemApps: Boolean? = null
     var raiseProjectionDuringCall: Boolean? = null
     var showOverLockScreen: Boolean? = null
+    var lockedGestures: Boolean? = null
     var insetLeft: Int? = null
     var insetTop: Int? = null
     var insetRight: Int? = null
@@ -189,6 +190,7 @@ class SettingsPendingCopy {
         autoKillOemApps = settings.autoKillOemApps
         raiseProjectionDuringCall = settings.raiseProjectionDuringCall
         showOverLockScreen = settings.showOverLockScreen
+        lockedGestures = settings.lockedGestures
         insetLeft = settings.insetLeft
         insetTop = settings.insetTop
         insetRight = settings.insetRight
@@ -283,6 +285,7 @@ class SettingsPendingCopy {
         autoKillOemApps != settings.autoKillOemApps ||
         raiseProjectionDuringCall != settings.raiseProjectionDuringCall ||
         showOverLockScreen != settings.showOverLockScreen ||
+        lockedGestures != settings.lockedGestures ||
         insetLeft != settings.insetLeft ||
         insetTop != settings.insetTop ||
         insetRight != settings.insetRight ||

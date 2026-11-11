@@ -8,6 +8,18 @@ import org.junit.Test
 
 class LockedInputPolicyTest {
 
+    private val mediaKeys = listOf(
+        KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PAUSE,
+        KeyEvent.KEYCODE_MEDIA_NEXT, KeyEvent.KEYCODE_MEDIA_PREVIOUS
+    )
+
+    /** Keys that could open or select something on the phone; never let through while locked. */
+    private val otherKeys = listOf(
+        KeyEvent.KEYCODE_SEARCH, KeyEvent.KEYCODE_CALL, KeyEvent.KEYCODE_HOME, KeyEvent.KEYCODE_BACK,
+        KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_MUSIC,
+        KeyEvent.KEYCODE_MEDIA_STOP, 65536, 65537
+    )
+
     @Test
     fun `setting off never holds input, locked or not`() {
         assertFalse(LockedInputPolicy.shouldEngage(enabled = false, deviceLocked = true, screenOff = true))
@@ -53,18 +65,33 @@ class LockedInputPolicyTest {
 
     @Test
     fun `not engaged lets every event through`() {
-        assertTrue(LockedInputPolicy.allows(engaged = false, keycode = null))
-        assertTrue(LockedInputPolicy.allows(engaged = false, keycode = KeyEvent.KEYCODE_SEARCH))
+        assertTrue(LockedInputPolicy.allows(engaged = false, mediaKeys = false, keycode = null))
+        assertTrue(LockedInputPolicy.allows(engaged = false, mediaKeys = false, keycode = KeyEvent.KEYCODE_SEARCH))
     }
 
     @Test
     fun `engaged drops touch, scroll and every key but the map key`() {
-        assertFalse(LockedInputPolicy.allows(engaged = true, keycode = null))
-        listOf(
-            KeyEvent.KEYCODE_SEARCH, KeyEvent.KEYCODE_CALL, KeyEvent.KEYCODE_HOME, KeyEvent.KEYCODE_BACK,
-            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_MEDIA_NEXT,
-            65536, 65537
-        ).forEach { assertFalse("keycode $it", LockedInputPolicy.allows(engaged = true, keycode = it)) }
-        assertTrue(LockedInputPolicy.allows(engaged = true, keycode = LockedInputPolicy.KEYCODE_AA_NAVIGATION))
+        assertFalse(LockedInputPolicy.allows(engaged = true, mediaKeys = false, keycode = null))
+        (otherKeys + mediaKeys).forEach {
+            assertFalse("keycode $it", LockedInputPolicy.allows(engaged = true, mediaKeys = false, keycode = it))
+        }
+        assertTrue(
+            LockedInputPolicy.allows(engaged = true, mediaKeys = false, keycode = LockedInputPolicy.KEYCODE_AA_NAVIGATION)
+        )
+    }
+
+    @Test
+    fun `gestures while locked let the media keys through and nothing else`() {
+        mediaKeys.forEach {
+            assertTrue("keycode $it", LockedInputPolicy.allows(engaged = true, mediaKeys = true, keycode = it))
+        }
+        otherKeys.forEach {
+            assertFalse("keycode $it", LockedInputPolicy.allows(engaged = true, mediaKeys = true, keycode = it))
+        }
+        // Touch and scroll carry no keycode: still held back.
+        assertFalse(LockedInputPolicy.allows(engaged = true, mediaKeys = true, keycode = null))
+        assertTrue(
+            LockedInputPolicy.allows(engaged = true, mediaKeys = true, keycode = LockedInputPolicy.KEYCODE_AA_NAVIGATION)
+        )
     }
 }

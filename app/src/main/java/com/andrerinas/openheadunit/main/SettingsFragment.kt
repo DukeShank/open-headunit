@@ -270,6 +270,7 @@ class SettingsFragment : Fragment() {
     private var pendingAutoKillOemApps by pending::autoKillOemApps
     private var pendingRaiseProjectionDuringCall by pending::raiseProjectionDuringCall
     private var pendingShowOverLockScreen by pending::showOverLockScreen
+    private var pendingLockedGestures by pending::lockedGestures
 
     // Custom Insets
     private var pendingInsetLeft by pending::insetLeft
@@ -695,6 +696,7 @@ class SettingsFragment : Fragment() {
         pendingAutoKillOemApps?.let { if (it != settings.autoKillOemApps) settings.autoKillOemApps = it }
         pendingRaiseProjectionDuringCall?.let { if (it != settings.raiseProjectionDuringCall) settings.raiseProjectionDuringCall = it }
         pendingShowOverLockScreen?.let { if (it != settings.showOverLockScreen) settings.showOverLockScreen = it }
+        pendingLockedGestures?.let { if (it != settings.lockedGestures) settings.lockedGestures = it }
         pendingAutoEnableHotspot?.let { if (it != settings.autoEnableHotspot) settings.autoEnableHotspot = it }
         pendingAutoRestartWifi?.let { if (it != settings.autoRestartWifiWhenP2pStuck) settings.autoRestartWifiWhenP2pStuck = it }
         pendingUseLibusb?.let { if (it != settings.useLibusb) settings.useLibusb = it }
@@ -2123,6 +2125,22 @@ class SettingsFragment : Fragment() {
                 updateSettingsList()
             }
         ))
+
+        // What a locked unit may still do. Only offered while the projection shows over the lock screen.
+        if (pendingShowOverLockScreen ?: settings.showOverLockScreen) {
+            items.add(SettingItem.ToggleSettingEntry(
+                stableId = "lockedGestures",
+                nameResId = R.string.locked_gestures,
+                descriptionResId = R.string.locked_gestures_summary,
+                helpResId = R.string.locked_gestures_help,
+                isChecked = pendingLockedGestures ?: settings.lockedGestures,
+                onCheckedChanged = { isChecked ->
+                    pendingLockedGestures = isChecked
+                    checkChanges()
+                    updateSettingsList()
+                }
+            ))
+        }
 
         if (!isCarLauncherActive) {
             val exitActions = arrayOf(

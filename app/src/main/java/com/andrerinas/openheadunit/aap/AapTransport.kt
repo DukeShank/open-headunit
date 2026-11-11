@@ -1372,7 +1372,8 @@ class AapTransport(
         // Every touch, key and scroll from every source (screen, keymap, media session, automation
         // broadcasts) passes here, so this is where a locked unit holds them back.
         if (message.channel == Channel.ID_INP && message.type == Input.MsgType.EVENT_VALUE &&
-            !LockedInputPolicy.allows(LockedInputPolicy.engaged, (message as? KeyCodeEvent)?.keycode)) {
+            !LockedInputPolicy.allows(LockedInputPolicy.engaged, LockedInputPolicy.mediaKeys,
+                (message as? KeyCodeEvent)?.keycode)) {
             if (AppLog.LOG_VERBOSE) AppLog.v("AapTransport: unit is locked, input event not sent")
             return
         }
