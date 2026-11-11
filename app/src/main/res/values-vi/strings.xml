@@ -1303,6 +1303,9 @@
     <string name="locked_gestures">Cử chỉ khi đang khóa</string>
     <string name="locked_gestures_summary">Vuốt hai ngón: bài tiếp theo hoặc bài trước. Chạm hai ngón: phát hoặc tạm dừng.</string>
     <string name="locked_gestures_help">Khi thiết bị này đang khóa, hãy vuốt sang phải bằng hai ngón tay để chuyển bài tiếp theo, sang trái để về bài trước, hoặc chạm bằng hai ngón tay để phát hay tạm dừng. Các cử chỉ được gửi tới điện thoại dưới dạng phím đa phương tiện, chỉ có thể điều khiển việc phát; thao tác chạm vẫn không tới được Android Auto. Chạm bằng một ngón tay không có tác dụng.</string>
+    <string name="relock_idle">Khóa lại khi không hoạt động</string>
+    <string name="relock_idle_summary">Khóa thiết bị này sau một thời gian không chạm. Bản đồ vẫn hiển thị.</string>
+    <string name="relock_idle_help">Thiết bị đã mở khóa sẽ vẫn mở chừng nào màn hình còn bật, và màn hình chiếu giữ cho màn hình luôn bật. Khi đặt thời gian ở đây, thiết bị tự khóa sau khi màn hình chiếu không được chạm trong khoảng thời gian đó, rồi hiển thị lại bản đồ ở chế độ khóa. Tính năng này cần quyền tắt màn hình và chỉ hoạt động khi màn hình chiếu đang ở phía trước.</string>
     <string name="audio_stream_settings">Luồng âm thanh</string>
     <string name="audio_stream_settings_description">Chọn luồng hệ thống mà mỗi kênh Android Auto sẽ phát trên đó.</string>
     <string name="audio_stream_settings_info">Android Auto gửi âm thanh qua ba kênh: Đa phương tiện, Chỉ dẫn và Âm thanh hệ thống. Mỗi kênh được chuyển tới đầu máy qua một luồng hệ thống. Luồng bạn chọn quyết định kênh đó theo phím âm lượng nào và, trên nhiều đầu máy, có bật tiếng bộ khuếch đại cho kênh đó hay không. Hãy dùng nút loa để nghe âm thanh thử trên luồng trước khi lưu.</string>

@@ -51,6 +51,7 @@ import com.andrerinas.openheadunit.utils.AppLog
 import com.andrerinas.openheadunit.utils.ScreenPower
 import com.andrerinas.openheadunit.input.LockedInputPolicy
 import com.andrerinas.openheadunit.input.LockedGestureTracker
+import com.andrerinas.openheadunit.input.IdleRelockPolicy
 import com.andrerinas.openheadunit.utils.BluetoothHelper
 import com.andrerinas.openheadunit.utils.CarLauncherManager
 import com.andrerinas.openheadunit.connection.self.SelfModeCallRaisePolicy
@@ -107,11 +108,23 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     private var lastLockedHintMs = 0L
     /** Follows the current touch on a locked unit when "Gestures while locked" is on. */
     private var lockedGesture: LockedGestureTracker? = null
+
+    // "Lock again when idle": the countdown, and the screen-on that follows the lock. Its own
+    // handler, because the wake has to outlive the pause that the dark screen brings.
+    private val relockHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val relockRunnable = Runnable { lockIdleUnit() }
+    private val relockWakeRunnable = Runnable { wakeAfterRelock() }
+    private val relockWakeExpiryRunnable = Runnable { relockWakeOwed = false }
+    private var relockWakeOwed = false
+    private var lastRelockArmMs = 0L
     private var isLockStateReceiverRegistered = false
     private val lockStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                Intent.ACTION_SCREEN_OFF -> refreshLockedInput("screen off", screenOff = true)
+                Intent.ACTION_SCREEN_OFF -> {
+                    refreshLockedInput("screen off", screenOff = true)
+                    onScreenOffAfterRelock()
+                }
                 Intent.ACTION_SCREEN_ON -> refreshLockedInput("screen on")
                 Intent.ACTION_USER_PRESENT -> refreshLockedInput("unlocked")
             }
@@ -1383,6 +1396,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     override fun onPause() {
         clearTwoFingerTracking()
         isForeground = false
+        stopIdleRelock()
         AppLog.i("AapProjectionActivity: onPause")
         super.onPause()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) setTurnScreenOn(false)
@@ -1456,6 +1470,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         // Again here: the setting may have changed in the settings screen.
         applyShowOverLockScreen()
         refreshLockedInput("resume")
+        armIdleRelock()
         closeCallRaiseEpisode("the projection is back in front")
         AppLog.i("AapProjectionActivity: onResume")
         // Show the one-time rename notice even here, on top of an active projection.
@@ -1551,7 +1566,11 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         if (engage == LockedInputPolicy.engaged) return
         LockedInputPolicy.engaged = engage
         AppLog.i("AapProjectionActivity: locked-unit input hold ${if (engage) "on" else "off"} ($reason)")
-        if (!engage) return
+        if (!engage) {
+            armIdleRelock()
+            return
+        }
+        stopIdleRelock()
         exitDialog?.dismiss()
         exitDialog = null
         (supportFragmentManager.findFragmentByTag("quick_settings") as? androidx.fragment.app.DialogFragment)
@@ -1560,6 +1579,65 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         // Straight to the transport, past the keymap: this is Android Auto's own map key.
         commManager.send(LockedInputPolicy.KEYCODE_AA_NAVIGATION, true)
         commManager.send(LockedInputPolicy.KEYCODE_AA_NAVIGATION, false)
+    }
+
+    /** Restarts the countdown of "Lock again when idle", or stops it when it should not run. */
+    private fun armIdleRelock() {
+        relockHandler.removeCallbacks(relockRunnable)
+        lastRelockArmMs = SystemClock.elapsedRealtime()
+        val seconds = IdleRelockPolicy.normalize(settings.relockIdleSeconds)
+        if (!IdleRelockPolicy.shouldRun(settings.showOverLockScreen, seconds, LockedInputPolicy.engaged, isForeground)) return
+        relockHandler.postDelayed(relockRunnable, seconds * 1000L)
+    }
+
+    private fun stopIdleRelock() {
+        relockHandler.removeCallbacks(relockRunnable)
+    }
+
+    /** A touch or key on the unlocked projection restarts the countdown, at most once a second. */
+    private fun noteUseForIdleRelock() {
+        if (SystemClock.elapsedRealtime() - lastRelockArmMs >= RELOCK_REARM_MIN_MS) armIdleRelock()
+    }
+
+    /**
+     * The countdown ran out: lock the unit. The lock darkens the screen; [onScreenOffAfterRelock]
+     * lights it again, and the map is back over the lock screen with input held.
+     */
+    private fun lockIdleUnit() {
+        val seconds = IdleRelockPolicy.normalize(settings.relockIdleSeconds)
+        if (!IdleRelockPolicy.shouldRun(settings.showOverLockScreen, seconds, LockedInputPolicy.engaged, isForeground)) return
+        relockWakeOwed = true
+        if (!ScreenPower.turnOff(this)) {
+            relockWakeOwed = false
+            AppLog.w("AapProjectionActivity: untouched for ${seconds}s but the unit cannot be locked, no device admin grant")
+            return
+        }
+        AppLog.i("AapProjectionActivity: untouched for ${seconds}s while unlocked, locking the unit again")
+        // Hold input from this moment, not from the screen-off broadcast that follows.
+        refreshLockedInput("idle lock", screenOff = true)
+        relockHandler.removeCallbacks(relockWakeExpiryRunnable)
+        relockHandler.postDelayed(relockWakeExpiryRunnable, RELOCK_WAKE_WINDOW_MS)
+    }
+
+    /** The screen went dark. When the idle lock did that, light it again shortly after. */
+    private fun onScreenOffAfterRelock() {
+        if (!relockWakeOwed) return
+        relockWakeOwed = false
+        relockHandler.removeCallbacks(relockWakeExpiryRunnable)
+        relockHandler.postDelayed(relockWakeRunnable, RELOCK_WAKE_DELAY_MS)
+    }
+
+    /** Asks the service for its screen-on, the one that also follows returning power. */
+    private fun wakeAfterRelock() {
+        AppLog.i("AapProjectionActivity: lighting the screen again after the idle lock")
+        try {
+            ContextCompat.startForegroundService(this, Intent(this, AapService::class.java).apply {
+                action = AapService.ACTION_TURN_SCREEN_ON
+            })
+        } catch (e: Exception) {
+            AppLog.w("AapProjectionActivity: screen-on request after the idle lock failed: ${e.message}")
+            ScreenPower.wakeBriefly(this)
+        }
     }
 
     /** Asks the system to lift the keyguard; a secure one shows its PIN, pattern or password screen. */
@@ -2341,6 +2419,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             return true
         }
         lockedGesture = null
+        noteUseForIdleRelock()
         if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
             consumeGestureUntilUp = false
             clearTwoFingerTracking()
@@ -2882,6 +2961,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
                 else -> true
             }
         }
+        noteUseForIdleRelock()
 
         // 1. Let the system handle volume keys and unmapped back keys.
         // If Back was explicitly learned in Keymap and transport is running,
@@ -2975,6 +3055,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             unregisterReceiver(lockStateReceiver)
             isLockStateReceiverRegistered = false
         }
+        relockHandler.removeCallbacksAndMessages(null)
         exitDialog = null
         // Defensive cleanup: if the activity is destroyed while the loading
         // overlay is still up (early connection failure, system kill,
@@ -3003,6 +3084,12 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         private const val RETURN_REARM_DELAY_MS = 300L
         /** Shortest gap between two "Locked" hints. */
         private const val LOCKED_HINT_INTERVAL_MS = 5_000L
+        /** Shortest gap between two restarts of the idle countdown by touches and keys. */
+        private const val RELOCK_REARM_MIN_MS = 1_000L
+        /** From the screen going dark after an idle lock to the request that lights it again. */
+        private const val RELOCK_WAKE_DELAY_MS = 400L
+        /** How long an idle lock waits for its screen-off before it stops expecting one. */
+        private const val RELOCK_WAKE_WINDOW_MS = 3_000L
         const val EXTRA_FOCUS = "focus"
 
         /** Set by a caller that opens this screen just before it starts a session. */

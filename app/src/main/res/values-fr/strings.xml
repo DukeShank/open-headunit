@@ -1359,6 +1359,9 @@
     <string name="locked_gestures">Gestes lorsque verrouillé</string>
     <string name="locked_gestures_summary">Balayage à deux doigts : titre suivant ou précédent. Appui à deux doigts : lecture/pause.</string>
     <string name="locked_gestures_help">Tant que cet appareil est verrouillé, balayez vers la droite avec deux doigts pour le titre suivant, vers la gauche pour le précédent, ou touchez avec deux doigts pour lire ou mettre en pause. Les gestes sont envoyés au téléphone sous forme de touches multimédias, qui ne peuvent que commander la lecture ; les appuis n\'atteignent toujours pas Android Auto. Un appui à un seul doigt ne fait rien.</string>
+    <string name="relock_idle">Reverrouiller en cas d\'inactivité</string>
+    <string name="relock_idle_summary">Verrouille cet appareil après un délai sans appui. La carte reste visible.</string>
+    <string name="relock_idle_help">Un appareil déverrouillé reste ouvert tant que son écran est allumé, et la projection garde l\'écran allumé. Avec un délai défini ici, l\'appareil se verrouille de lui-même dès que la projection n\'a pas été touchée pendant ce délai, puis affiche de nouveau la carte en mode verrouillé. Cela nécessite l\'autorisation d\'éteindre l\'écran et n\'agit que lorsque la projection est au premier plan.</string>
     <string name="audio_stream_settings">Flux audio</string>
     <string name="audio_stream_settings_description">Choisissez le flux système sur lequel joue chaque canal Android Auto.</string>
     <string name="audio_stream_settings_info">Android Auto envoie l\'audio sur trois canaux : Multimédia, Guidage et Sons système. Chacun parvient à l\'autoradio sur un flux système. Le flux choisi détermine la touche de volume utilisée et, sur de nombreux autoradios, si l\'amplificateur sort du mode muet pour ce canal. Utilisez le bouton haut-parleur pour écouter une tonalité de test sur le flux avant d\'enregistrer.</string>

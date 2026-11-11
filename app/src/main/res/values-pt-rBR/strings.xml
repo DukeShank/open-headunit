@@ -1303,6 +1303,9 @@
     <string name="locked_gestures">Gestos com bloqueio</string>
     <string name="locked_gestures_summary">Deslizar com dois dedos: faixa seguinte ou anterior. Tocar com dois dedos: reproduzir ou pausar.</string>
     <string name="locked_gestures_help">Enquanto esta unidade estiver bloqueada, deslize para a direita com dois dedos para a próxima faixa, para a esquerda para a anterior, ou toque com dois dedos para reproduzir ou pausar. Os gestos são enviados ao celular como teclas de mídia, que só podem controlar a reprodução; os toques continuam sem chegar ao Android Auto. Um toque com um dedo não faz nada.</string>
+    <string name="relock_idle">Bloquear novamente por inatividade</string>
+    <string name="relock_idle_summary">Bloqueia esta unidade após um tempo sem toques. O mapa continua visível.</string>
+    <string name="relock_idle_help">Uma unidade desbloqueada permanece aberta enquanto a tela estiver ligada, e a projeção mantém a tela ligada. Com um tempo definido aqui, a unidade se bloqueia sozinha quando a projeção fica esse tempo sem ser tocada e depois mostra o mapa de novo no modo bloqueado. Isso exige a permissão para desligar a tela e só atua enquanto a projeção está em primeiro plano.</string>
     <string name="audio_stream_settings">Fluxos de áudio</string>
     <string name="audio_stream_settings_description">Escolha o fluxo do sistema em que cada canal do Android Auto toca.</string>
     <string name="audio_stream_settings_info">O Android Auto envia áudio em três canais: Mídia, Orientação e Sons do sistema. Cada um chega à central multimídia por um fluxo do sistema, e o fluxo escolhido define a tecla de volume que ele segue e, em muitas centrais, se o amplificador é ativado para ele. Use o botão do alto-falante para ouvir um tom de teste no fluxo antes de salvar.</string>

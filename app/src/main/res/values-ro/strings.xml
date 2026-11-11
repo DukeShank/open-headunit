@@ -1299,6 +1299,9 @@
     <string name="locked_gestures">Gesturi când este blocat</string>
     <string name="locked_gestures_summary">Glisare cu două degete: piesa următoare sau anterioară. Atingere cu două degete: redare/pauză.</string>
     <string name="locked_gestures_help">Cât timp această unitate este blocată, glisați spre dreapta cu două degete pentru piesa următoare, spre stânga pentru cea anterioară sau atingeți cu două degete pentru redare ori pauză. Gesturile sunt trimise telefonului ca taste media, care pot controla doar redarea; atingerile tot nu ajung la Android Auto. O atingere cu un singur deget nu face nimic.</string>
+    <string name="relock_idle">Blochează din nou la inactivitate</string>
+    <string name="relock_idle_summary">Blochează unitatea după un timp fără atingeri. Harta rămâne vizibilă.</string>
+    <string name="relock_idle_help">O unitate deblocată rămâne deschisă cât timp ecranul este aprins, iar proiecția ține ecranul aprins. Cu un timp setat aici, unitatea se blochează singură după ce proiecția nu a fost atinsă atât timp, apoi afișează din nou harta în modul blocat. Este necesară permisiunea de a stinge ecranul și funcționează doar cât timp proiecția este în prim-plan.</string>
     <string name="audio_stream_settings">Fluxuri audio</string>
     <string name="audio_stream_settings_description">Alege fluxul de sistem pe care se redă fiecare canal Android Auto.</string>
     <string name="audio_stream_settings_info">Android Auto trimite sunetul pe trei canale: Media, Ghidare și Sunete de sistem. Fiecare ajunge la unitatea auto pe un flux de sistem, iar fluxul ales stabilește ce tastă de volum urmează și, pe multe unități, dacă amplificatorul se activează pentru el. Folosește butonul difuzorului pentru a auzi un ton de test pe flux înainte de salvare.</string>

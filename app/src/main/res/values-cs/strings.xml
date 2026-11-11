@@ -1303,6 +1303,9 @@
     <string name="locked_gestures">Gesta při zamčení</string>
     <string name="locked_gestures_summary">Přejetí dvěma prsty: další nebo předchozí skladba. Klepnutí dvěma prsty: přehrát/pozastavit.</string>
     <string name="locked_gestures_help">Dokud je tato jednotka zamčená, přejeďte dvěma prsty doprava pro další skladbu, doleva pro předchozí, nebo klepněte dvěma prsty pro přehrání či pozastavení. Gesta se do telefonu posílají jako mediální klávesy, které mohou ovládat jen přehrávání; dotyky se do Android Auto stále nedostanou. Dotyk jedním prstem nedělá nic.</string>
+    <string name="relock_idle">Znovu zamknout při nečinnosti</string>
+    <string name="relock_idle_summary">Zamkne tuto jednotku po době bez dotyku. Mapa zůstane viditelná.</string>
+    <string name="relock_idle_help">Odemčená jednotka zůstává otevřená, dokud svítí obrazovka, a projekce nechává obrazovku zapnutou. Je-li zde nastaven čas, jednotka se sama zamkne, jakmile se projekce po tuto dobu nikdo nedotkl, a pak znovu zobrazí mapu v zamčeném režimu. Je k tomu potřeba oprávnění vypínat obrazovku a funguje to jen tehdy, když je projekce v popředí.</string>
     <string name="audio_stream_settings">Zvukové streamy</string>
     <string name="audio_stream_settings_description">Vyberte systémový stream, na kterém hraje každý kanál Android Auto.</string>
     <string name="audio_stream_settings_info">Android Auto posílá zvuk třemi kanály: Média, Navigace a Systémové zvuky. Každý se do autorádia dostane určitým systémovým streamem a zvolený stream určuje, kterým tlačítkem hlasitosti se řídí a u řady autorádií i to, zda se pro něj vůbec zapne zesilovač. Tlačítkem reproduktoru si před uložením přehrajte na streamu zkušební tón.</string>

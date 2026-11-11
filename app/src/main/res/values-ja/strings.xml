@@ -1305,6 +1305,9 @@
     <string name="locked_gestures">ロック中のジェスチャー</string>
     <string name="locked_gestures_summary">2本指スワイプ: 次の曲または前の曲。2本指タップ: 再生または一時停止。</string>
     <string name="locked_gestures_help">このユニットがロックされている間、2本指で右にスワイプすると次の曲、左にスワイプすると前の曲に移動し、2本指でタップすると再生または一時停止します。ジェスチャーはメディアキーとしてスマートフォンに送られ、再生の操作しかできません。タッチは引き続き Android Auto には送られません。1本指のタッチでは何も起こりません。</string>
+    <string name="relock_idle">操作がないときに再ロック</string>
+    <string name="relock_idle_summary">一定時間タッチがないとこのユニットをロックします。地図は表示されたままです。</string>
+    <string name="relock_idle_help">ロックを解除したユニットは画面がオンの間は開いたままになり、投影画面は画面をオンのままにします。ここで時間を設定すると、投影画面にその時間タッチがなかった場合にユニットが自動的にロックされ、ロックモードで再び地図を表示します。画面をオフにする権限が必要で、投影画面が前面にあるときだけ動作します。</string>
     <string name="audio_stream_settings">オーディオストリーム</string>
     <string name="audio_stream_settings_description">Android Auto の各チャンネルを再生するシステムストリームを選択します。</string>
     <string name="audio_stream_settings_info">Android Auto は音声を「メディア」「音声案内」「システム音」の 3 チャンネルで送信します。各チャンネルはシステムストリーム経由でヘッドユニットに届き、選んだストリームによって連動する音量キーが決まります。多くのヘッドユニットでは、そもそもアンプが作動するかどうかも左右します。保存する前にスピーカーボタンでテスト音を鳴らして確認してください。</string>

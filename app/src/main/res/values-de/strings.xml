@@ -1302,6 +1302,9 @@
     <string name="locked_gestures">Gesten im gesperrten Zustand</string>
     <string name="locked_gestures_summary">Wischen mit zwei Fingern: nächster oder vorheriger Titel. Tippen: Wiedergabe/Pause.</string>
     <string name="locked_gestures_help">Solange dieses Gerät gesperrt ist: Mit zwei Fingern nach rechts wischen für den nächsten Titel, nach links für den vorherigen, oder mit zwei Fingern tippen für Wiedergabe oder Pause. Die Gesten werden als Medientasten an das Smartphone gesendet, die nur die Wiedergabe steuern können; Berührungen erreichen Android Auto weiterhin nicht. Eine Berührung mit einem Finger bewirkt nichts.</string>
+    <string name="relock_idle">Bei Inaktivität wieder sperren</string>
+    <string name="relock_idle_summary">Sperrt dieses Gerät nach einer Zeit ohne Berührung. Die Karte bleibt sichtbar.</string>
+    <string name="relock_idle_help">Ein entsperrtes Gerät bleibt offen, solange der Bildschirm an ist, und die Projektion hält den Bildschirm an. Ist hier eine Zeit eingestellt, sperrt sich das Gerät selbst, sobald die Projektion so lange nicht berührt wurde, und zeigt danach wieder die Karte im gesperrten Modus. Dafür ist die Berechtigung zum Ausschalten des Bildschirms nötig, und es wirkt nur, solange die Projektion im Vordergrund ist.</string>
     <string name="audio_stream_settings">Audio-Streams</string>
     <string name="audio_stream_settings_description">Lege fest, über welchen Systemstream jeder Android-Auto-Kanal wiedergegeben wird.</string>
     <string name="audio_stream_settings_info">Android Auto sendet Audio über drei Kanäle: Medien, Ansagen und Systemtöne. Jeder Kanal erreicht die Headunit über einen Systemstream. Der gewählte Stream bestimmt, welcher Lautstärketaste der Kanal folgt und bei vielen Headunits, ob der Verstärker dafür überhaupt eingeschaltet wird. Mit der Lautsprechertaste kannst du vor dem Speichern einen Testton auf dem Stream abspielen.</string>

@@ -1307,6 +1307,9 @@
     <string name="locked_gestures">Gebaren bij vergrendeling</string>
     <string name="locked_gestures_summary">Vegen met twee vingers: volgend of vorig nummer. Tikken met twee vingers: afspelen/pauze.</string>
     <string name="locked_gestures_help">Zolang dit apparaat vergrendeld is: veeg met twee vingers naar rechts voor het volgende nummer, naar links voor het vorige, of tik met twee vingers om af te spelen of te pauzeren. De gebaren worden als mediatoetsen naar de telefoon gestuurd, die alleen het afspelen kunnen bedienen; aanrakingen bereiken Android Auto nog steeds niet. Een aanraking met één vinger doet niets.</string>
+    <string name="relock_idle">Opnieuw vergrendelen bij inactiviteit</string>
+    <string name="relock_idle_summary">Vergrendelt dit apparaat na een tijd zonder aanraking. De kaart blijft zichtbaar.</string>
+    <string name="relock_idle_help">Een ontgrendeld apparaat blijft open zolang het scherm aan is, en de projectie houdt het scherm aan. Met een hier ingestelde tijd vergrendelt het apparaat zichzelf zodra de projectie zo lang niet is aangeraakt, en toont daarna de kaart weer in vergrendelde modus. Hiervoor is de toestemming nodig om het scherm uit te schakelen, en het werkt alleen terwijl de projectie op de voorgrond staat.</string>
     <string name="audio_stream_settings">Audiostreams</string>
     <string name="audio_stream_settings_description">Kies via welke systeemstream elk Android Auto-kanaal wordt afgespeeld.</string>
     <string name="audio_stream_settings_info">Android Auto verstuurt audio via drie kanalen: Media, Navigatiestem en Systeemgeluiden. Elk kanaal bereikt de headunit via een systeemstream. De gekozen stream bepaalt welke volumetoets erbij hoort en, op veel headunits, of de versterker er wel voor wordt aangezet. Gebruik de luidsprekerknop om vóór het opslaan een testtoon op de stream te horen.</string>

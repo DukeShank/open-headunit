@@ -45,6 +45,7 @@ import com.andrerinas.openheadunit.connection.wifi.modes.nativeaa.esp32.Esp32Rel
 import com.andrerinas.openheadunit.connection.wifi.modes.nativeaa.CredentialField
 import com.andrerinas.openheadunit.connection.wifi.modes.nativeaa.NativeAaWakeDamagePolicy
 import com.andrerinas.openheadunit.connection.wifi.modes.nativeaa.zbt.ZbtProbe
+import com.andrerinas.openheadunit.input.IdleRelockPolicy
 import com.andrerinas.openheadunit.input.MediaKeyRoutingPolicy
 import com.andrerinas.openheadunit.connection.wifi.direct.ObservedP2pCredentials
 import com.andrerinas.openheadunit.connection.wifi.direct.P2pIdentityEdit
@@ -71,6 +72,7 @@ import com.andrerinas.openheadunit.main.settings.SettingsFilterPolicy
 import com.andrerinas.openheadunit.main.settings.SettingsHeaderController
 import com.andrerinas.openheadunit.main.settings.SettingsLayoutPolicy
 import com.andrerinas.openheadunit.utils.AppLog
+import com.andrerinas.openheadunit.utils.ScreenPower
 import com.andrerinas.openheadunit.utils.AppPermissions
 import com.andrerinas.openheadunit.utils.AppThemeManager
 import com.andrerinas.openheadunit.utils.Settings
@@ -271,6 +273,7 @@ class SettingsFragment : Fragment() {
     private var pendingRaiseProjectionDuringCall by pending::raiseProjectionDuringCall
     private var pendingShowOverLockScreen by pending::showOverLockScreen
     private var pendingLockedGestures by pending::lockedGestures
+    private var pendingRelockIdleSeconds by pending::relockIdleSeconds
 
     // Custom Insets
     private var pendingInsetLeft by pending::insetLeft
@@ -697,6 +700,7 @@ class SettingsFragment : Fragment() {
         pendingRaiseProjectionDuringCall?.let { if (it != settings.raiseProjectionDuringCall) settings.raiseProjectionDuringCall = it }
         pendingShowOverLockScreen?.let { if (it != settings.showOverLockScreen) settings.showOverLockScreen = it }
         pendingLockedGestures?.let { if (it != settings.lockedGestures) settings.lockedGestures = it }
+        pendingRelockIdleSeconds?.let { if (it != settings.relockIdleSeconds) settings.relockIdleSeconds = it }
         pendingAutoEnableHotspot?.let { if (it != settings.autoEnableHotspot) settings.autoEnableHotspot = it }
         pendingAutoRestartWifi?.let { if (it != settings.autoRestartWifiWhenP2pStuck) settings.autoRestartWifiWhenP2pStuck = it }
         pendingUseLibusb?.let { if (it != settings.useLibusb) settings.useLibusb = it }
@@ -2140,6 +2144,44 @@ class SettingsFragment : Fragment() {
                     updateSettingsList()
                 }
             ))
+
+            // An unlocked unit stays open while the projection keeps the screen on; this locks it again.
+            val relockChoices = IdleRelockPolicy.CHOICES_SECONDS
+            val relockSeconds = IdleRelockPolicy.normalize(pendingRelockIdleSeconds ?: settings.relockIdleSeconds)
+            val relockLabels = relockChoices.map { relockIdleLabel(it) }.toTypedArray()
+            items.add(SettingItem.SettingEntry(
+                stableId = "relockIdle",
+                nameResId = R.string.relock_idle,
+                descriptionResId = R.string.relock_idle_summary,
+                helpResId = R.string.relock_idle_help,
+                value = relockIdleLabel(relockSeconds),
+                onClick = { _ ->
+                    MaterialAlertDialogBuilder(requireContext(), R.style.DarkAlertDialog)
+                        .setTitle(R.string.relock_idle)
+                        .setSingleChoiceItems(relockLabels, relockChoices.indexOf(relockSeconds)) { dialog, which ->
+                            pendingRelockIdleSeconds = relockChoices[which]
+                            checkChanges()
+                            dialog.dismiss()
+                            updateSettingsList()
+                        }
+                        .show()
+                }
+            ))
+
+            // Locking needs the same device admin grant as "Turn the screen off too".
+            if (relockSeconds > 0) {
+                val granted = ScreenPower.hasLockGrant(requireContext())
+                items.add(SettingItem.SettingEntry(
+                    stableId = "relockScreenGrant",
+                    nameResId = R.string.external_power_grant_label,
+                    value = getString(if (granted) R.string.external_power_grant_allowed else R.string.external_power_grant_missing),
+                    onClick = { _ -> if (granted) confirmRemoveRelockScreenGrant() else requestRelockScreenGrant() }
+                ))
+                items.add(SettingItem.InfoBanner(
+                    stableId = "relockScreenGrantHint",
+                    textResId = R.string.external_power_grant_uninstall_hint
+                ))
+            }
         }
 
         if (!isCarLauncherActive) {
@@ -4012,6 +4054,43 @@ class SettingsFragment : Fragment() {
             requireContext(),
             nativeHost = (pendingWifiConnectionMode ?: settings.wifiConnectionMode) == WifiLauncherMode.NATIVE,
             hotspot = (pendingNativeApTransport ?: settings.nativeApStrategy) == NativeStrategy.HOTSPOT)
+
+    /** The label of one "Lock again when idle" choice: Disabled, seconds below a minute, minutes above. */
+    private fun relockIdleLabel(seconds: Int): String = when {
+        seconds <= 0 -> getString(R.string.disabled)
+        seconds < 60 -> getString(R.string.external_power_delay_value, seconds)
+        else -> getString(R.string.night_overlay_duration_minutes, seconds / 60)
+    }
+
+    /** Opens the system's device admin prompt for the screen-off grant; the list refreshes in onResume. */
+    private fun requestRelockScreenGrant() {
+        val intent = Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+            putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, ScreenPower.adminComponent(requireContext()))
+            putExtra(android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION, getString(R.string.external_power_grant_explanation))
+        }
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            AppLog.w("SettingsFragment: device admin prompt unavailable: ${e.message}")
+        }
+    }
+
+    private fun confirmRemoveRelockScreenGrant() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.DarkAlertDialog)
+            .setTitle(R.string.external_power_grant_label)
+            .setMessage(R.string.external_power_grant_remove_message)
+            .setPositiveButton(R.string.external_power_grant_remove) { _, _ ->
+                try {
+                    val dpm = requireContext().getSystemService(Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
+                    dpm.removeActiveAdmin(ScreenPower.adminComponent(requireContext()))
+                } catch (e: Exception) {
+                    AppLog.w("SettingsFragment: could not remove the device admin: ${e.message}")
+                }
+                updateSettingsList()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
 
     override fun onResume() {
         super.onResume()

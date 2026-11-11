@@ -1299,6 +1299,9 @@
     <string name="locked_gestures">锁定时的手势</string>
     <string name="locked_gestures_summary">双指滑动：下一首或上一首。双指点按：播放或暂停。</string>
     <string name="locked_gestures_help">此设备锁定期间，双指向右滑动切换到下一首，向左滑动回到上一首，双指点按可播放或暂停。这些手势会以媒体按键的形式发送到手机，只能控制播放；触摸仍然不会传到 Android Auto。单指触摸没有任何作用。</string>
+    <string name="relock_idle">闲置时重新锁定</string>
+    <string name="relock_idle_summary">一段时间没有触摸后锁定此设备。地图保持显示。</string>
+    <string name="relock_idle_help">已解锁的设备在屏幕亮着时会一直保持打开状态，而投屏画面会让屏幕保持常亮。在这里设置时间后，投屏画面在这段时间内没有被触摸时，设备会自行锁定，然后在锁定模式下重新显示地图。此功能需要关闭屏幕的权限，并且仅在投屏画面位于前台时生效。</string>
     <string name="audio_stream_settings">音频流</string>
     <string name="audio_stream_settings_description">选择每个 Android Auto 通道使用哪个系统流播放。</string>
     <string name="audio_stream_settings_info">Android Auto 通过媒体、导航语音和系统提示音三个通道传送音频。每个通道都会以某个系统流交给车机，所选的流决定它跟随哪个音量键，在许多车机上还决定功放是否会为它取消静音。保存前，可点按喇叭按钮在该流上播放测试音。</string>

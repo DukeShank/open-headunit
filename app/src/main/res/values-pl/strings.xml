@@ -1308,6 +1308,9 @@
     <string name="locked_gestures">Gesty przy blokadzie</string>
     <string name="locked_gestures_summary">Przesunięcie dwoma palcami: następny lub poprzedni utwór. Stuknięcie: odtwarzanie/pauza.</string>
     <string name="locked_gestures_help">Gdy to urządzenie jest zablokowane, przesuń dwoma palcami w prawo, aby przejść do następnego utworu, w lewo do poprzedniego, albo stuknij dwoma palcami, aby odtworzyć lub wstrzymać. Gesty są wysyłane do telefonu jako klawisze multimedialne, które mogą sterować tylko odtwarzaniem; dotyk nadal nie trafia do Android Auto. Dotknięcie jednym palcem nic nie robi.</string>
+    <string name="relock_idle">Blokuj ponownie po bezczynności</string>
+    <string name="relock_idle_summary">Blokuje to urządzenie po czasie bez dotyku. Mapa pozostaje widoczna.</string>
+    <string name="relock_idle_help">Odblokowane urządzenie pozostaje otwarte, dopóki ekran jest włączony, a projekcja utrzymuje ekran włączony. Po ustawieniu tu czasu urządzenie samo się blokuje, gdy projekcja nie była dotykana przez ten czas, a potem znów pokazuje mapę w trybie zablokowanym. Wymaga to uprawnienia do wyłączania ekranu i działa tylko wtedy, gdy projekcja jest na pierwszym planie.</string>
     <string name="audio_stream_settings">Strumienie dźwięku</string>
     <string name="audio_stream_settings_description">Wybierz strumień systemowy, na którym odtwarzany jest każdy kanał Android Auto.</string>
     <string name="audio_stream_settings_info">Android Auto wysyła dźwięk trzema kanałami: Multimedia, Wskazówki i Dźwięki systemowe. Każdy trafia do radia samochodowego określonym strumieniem systemowym, a wybrany strumień decyduje, którym przyciskiem głośności jest sterowany i — w wielu radiach — czy wzmacniacz w ogóle się dla niego włączy. Użyj przycisku głośnika, aby przed zapisaniem usłyszeć ton testowy na danym strumieniu.</string>

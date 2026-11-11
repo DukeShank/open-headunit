@@ -1318,6 +1318,9 @@
     <string name="locked_gestures">Gestos con bloqueo</string>
     <string name="locked_gestures_summary">Deslizar con dos dedos: pista siguiente o anterior. Tocar con dos dedos: reproducir o pausar.</string>
     <string name="locked_gestures_help">Mientras esta unidad esté bloqueada, desliza a la derecha con dos dedos para la pista siguiente, a la izquierda para la anterior, o toca con dos dedos para reproducir o pausar. Los gestos se envían al teléfono como teclas multimedia, que solo pueden controlar la reproducción; los toques siguen sin llegar a Android Auto. Un toque con un dedo no hace nada.</string>
+    <string name="relock_idle">Bloquear de nuevo por inactividad</string>
+    <string name="relock_idle_summary">Bloquea esta unidad tras un tiempo sin toques. El mapa sigue visible.</string>
+    <string name="relock_idle_help">Una unidad desbloqueada permanece abierta mientras su pantalla esté encendida, y la proyección mantiene la pantalla encendida. Con un tiempo definido aquí, la unidad se bloquea sola cuando la proyección lleva ese tiempo sin tocarse y luego vuelve a mostrar el mapa en modo bloqueado. Requiere el permiso para apagar la pantalla y solo actúa mientras la proyección está en primer plano.</string>
     <string name="audio_stream_settings">Flujos de audio</string>
     <string name="audio_stream_settings_description">Elige el flujo del sistema en el que suena cada canal de Android Auto.</string>
     <string name="audio_stream_settings_info">Android Auto envía el audio por tres canales: Multimedia, Guía y Sonidos del sistema. Cada uno llega a la unidad por un flujo del sistema, y el flujo que elijas determina qué tecla de volumen lo controla y, en muchas unidades, si el amplificador se activa para él. Usa el botón del altavoz para oír un tono de prueba en el flujo antes de guardar.</string>

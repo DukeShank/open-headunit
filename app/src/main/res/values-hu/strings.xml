@@ -1303,6 +1303,9 @@
     <string name="locked_gestures">Kézmozdulatok zárolt állapotban</string>
     <string name="locked_gestures_summary">Kétujjas húzás: következő vagy előző szám. Kétujjas koppintás: lejátszás/szünet.</string>
     <string name="locked_gestures_help">Amíg ez az egység zárolva van, húzza két ujját jobbra a következő számhoz, balra az előzőhöz, vagy koppintson két ujjal a lejátszáshoz vagy szüneteltetéshez. A kézmozdulatok médiagombként jutnak el a telefonhoz, amelyek csak a lejátszást vezérelhetik; az érintések továbbra sem érik el az Android Autót. Az egyujjas érintés nem csinál semmit.</string>
+    <string name="relock_idle">Újrazárolás tétlenség esetén</string>
+    <string name="relock_idle_summary">Érintés nélkül eltelt idő után zárolja az egységet. A térkép látható marad.</string>
+    <string name="relock_idle_help">A feloldott egység addig marad nyitva, amíg a képernyő be van kapcsolva, a kivetítés pedig bekapcsolva tartja a képernyőt. Ha itt időt állít be, az egység magától zárol, amint a kivetítést ennyi ideig nem érintették meg, majd zárolt módban újra megjeleníti a térképet. Ehhez szükség van a képernyő kikapcsolásának engedélyére, és csak akkor működik, amikor a kivetítés van előtérben.</string>
     <string name="audio_stream_settings">Hangfolyamok</string>
     <string name="audio_stream_settings_description">Válassza ki, melyik rendszerfolyamon szóljon az egyes Android Auto-csatornák hangja.</string>
     <string name="audio_stream_settings_info">Az Android Auto három csatornán küldi a hangot: Média, Útmutatás és Rendszerhangok. Mindegyik egy rendszerfolyamon jut el a fejegységhez, és a választott folyam dönti el, melyik hangerőgombra reagál, illetve sok fejegységnél azt is, hogy az erősítő egyáltalán bekapcsol-e hozzá. A hangszóró gombbal mentés előtt meghallgathat egy tesztjelet az adott folyamon.</string>
