@@ -50,6 +50,7 @@ import com.andrerinas.openheadunit.decoder.video.VideoDimensionsListener
 import com.andrerinas.openheadunit.utils.AppLog
 import com.andrerinas.openheadunit.utils.ScreenPower
 import com.andrerinas.openheadunit.input.LockedInputPolicy
+import com.andrerinas.openheadunit.input.LockedGestureTracker
 import com.andrerinas.openheadunit.utils.BluetoothHelper
 import com.andrerinas.openheadunit.utils.CarLauncherManager
 import com.andrerinas.openheadunit.connection.self.SelfModeCallRaisePolicy
@@ -104,6 +105,8 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     // "Locked" hint, and the receiver that follows screen-off and unlock.
     private var exitDialog: androidx.appcompat.app.AlertDialog? = null
     private var lastLockedHintMs = 0L
+    /** Follows the current touch on a locked unit when "Gestures while locked" is on. */
+    private var lockedGesture: LockedGestureTracker? = null
     private var isLockStateReceiverRegistered = false
     private val lockStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -1541,6 +1544,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
      * screen's dialogs and brings Android Auto's map to the front.
      */
     private fun refreshLockedInput(reason: String, screenOff: Boolean = false) {
+        LockedInputPolicy.mediaKeys = settings.lockedGestures
         val enabled = settings.showOverLockScreen
         val deviceLocked = if (LockedInputPolicy.needsLockState(enabled, screenOff)) isDeviceLockedNow() else null
         val engage = LockedInputPolicy.shouldEngage(enabled, deviceLocked, screenOff)
@@ -1569,6 +1573,61 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         if (now - lastLockedHintMs < LOCKED_HINT_INTERVAL_MS) return
         lastLockedHintMs = now
         ToastUtils.showToast(this, getString(R.string.show_over_lock_screen_locked_toast), Toast.LENGTH_SHORT)
+    }
+
+    /**
+     * A touch on a locked unit. Nothing of it goes to the phone. With "Gestures while locked" on,
+     * two fingers can swipe or tap for the media keys; one finger alone gets the "Locked" note.
+     */
+    private fun onLockedTouch(ev: MotionEvent) {
+        if (!LockedInputPolicy.mediaKeys) {
+            lockedGesture = null
+            if (ev.actionMasked == MotionEvent.ACTION_DOWN) showLockedHint()
+            return
+        }
+        val twoDown = ev.pointerCount == 2
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN ->
+                lockedGesture = LockedGestureTracker(resources.displayMetrics.density)
+            MotionEvent.ACTION_POINTER_DOWN ->
+                if (twoDown) {
+                    lockedGesture?.onSecondDown(ev.getX(0), ev.getY(0), ev.getX(1), ev.getY(1), ev.eventTime)
+                } else {
+                    lockedGesture?.spoil()
+                }
+            MotionEvent.ACTION_MOVE ->
+                if (twoDown) lockedGesture?.onMove(ev.getX(0), ev.getY(0), ev.getX(1), ev.getY(1))
+            MotionEvent.ACTION_POINTER_UP ->
+                if (twoDown) {
+                    lockedGesture?.onMove(ev.getX(0), ev.getY(0), ev.getX(1), ev.getY(1))
+                    val gesture = lockedGesture?.onLift(ev.eventTime)
+                    if (gesture != null) performLockedGesture(gesture)
+                }
+            MotionEvent.ACTION_UP -> {
+                if (lockedGesture?.sawSecondFinger != true) showLockedHint()
+                lockedGesture = null
+            }
+            MotionEvent.ACTION_CANCEL -> lockedGesture = null
+        }
+    }
+
+    /** Sends the media key of a locked-unit gesture and names it in a short note. */
+    private fun performLockedGesture(gesture: LockedGestureTracker.Gesture) {
+        val keyCode = when (gesture) {
+            LockedGestureTracker.Gesture.NEXT_TRACK -> KeyEvent.KEYCODE_MEDIA_NEXT
+            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> KeyEvent.KEYCODE_MEDIA_PREVIOUS
+            LockedGestureTracker.Gesture.PLAY_PAUSE -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+        }
+        val label = when (gesture) {
+            LockedGestureTracker.Gesture.NEXT_TRACK -> R.string.key_media_next
+            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> R.string.key_media_prev
+            LockedGestureTracker.Gesture.PLAY_PAUSE -> R.string.key_media_play_pause
+        }
+        AppLog.i("AapProjectionActivity: locked-unit gesture $gesture")
+        // Straight to the transport, past the keymap: a gesture is not a learned hardware key.
+        commManager.send(keyCode, true)
+        commManager.send(keyCode, false)
+        ToastUtils.showToast(this, label, Toast.LENGTH_SHORT)
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -2273,13 +2332,15 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     private val commManager get() = App.provide(this).commManager
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        // A locked unit takes no touch at all: not Android Auto's, not this screen's buttons or
-        // gestures. Re-read the lock state on each new touch in case a broadcast was missed.
+        // A locked unit passes no touch on: not to Android Auto, not to this screen's buttons or
+        // its unlocked gestures. Re-read the lock state on each new touch in case a broadcast was
+        // missed.
         if (ev.actionMasked == MotionEvent.ACTION_DOWN) refreshLockedInput("touch")
         if (LockedInputPolicy.engaged) {
-            if (ev.actionMasked == MotionEvent.ACTION_DOWN) showLockedHint()
+            onLockedTouch(ev)
             return true
         }
+        lockedGesture = null
         if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
             consumeGestureUntilUp = false
             clearTwoFingerTracking()

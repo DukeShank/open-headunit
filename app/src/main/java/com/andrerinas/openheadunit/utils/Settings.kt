@@ -297,6 +297,17 @@ class Settings(private val context: Context) {
             prefs.edit().putBoolean("show-over-lock-screen", value).apply()
         }
 
+    /**
+     * Two-finger gestures on a locked unit shown over the lock screen: swipe for the next or
+     * previous track, tap for play or pause. They are sent as media keys, never as touches; see
+     * [com.andrerinas.openheadunit.input.LockedGestureTracker]. Off by default.
+     */
+    var lockedGestures: Boolean
+        get() = prefs.getBoolean("locked-gestures", false)
+        set(value) {
+            prefs.edit().putBoolean("locked-gestures", value).apply()
+        }
+
     var nightMode: NightMode
         get() {
             val value = prefs.getInt("night-mode", 0)
