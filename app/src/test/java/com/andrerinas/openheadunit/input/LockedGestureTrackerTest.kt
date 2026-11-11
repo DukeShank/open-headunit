@@ -70,6 +70,49 @@ class LockedGestureTrackerTest {
     }
 
     @Test
+    fun `a swipe down is the text view`() {
+        val tracker = twoDown()
+        tracker.moveBoth(0f, dy = 260f)
+        assertEquals(Gesture.TEXT_VIEW, tracker.onLift(300L))
+    }
+
+    @Test
+    fun `a swipe up is the map view`() {
+        val tracker = twoDown()
+        tracker.moveBoth(40f, dy = -260f)
+        assertEquals(Gesture.MAP_VIEW, tracker.onLift(600L))
+    }
+
+    @Test
+    fun `a short or slow swipe down is nothing`() {
+        val short = twoDown()
+        short.moveBoth(0f, dy = 120f)
+        assertNull(short.onLift(300L))
+        val slow = twoDown()
+        slow.moveBoth(0f, dy = 260f)
+        assertNull(slow.onLift(LockedGestureTracker.SWIPE_MS + 1))
+    }
+
+    @Test
+    fun `a diagonal swipe is nothing`() {
+        val tracker = twoDown()
+        tracker.moveBoth(260f, dy = 260f)
+        assertNull(tracker.onLift(300L))
+    }
+
+    @Test
+    fun `two fingers moving apart up and down are nothing`() {
+        val tracker = twoDown()
+        tracker.onMove(500f, 40f, 600f, 560f)
+        assertNull(tracker.onLift(300L))
+    }
+
+    @Test
+    fun `only the view gestures switch the view`() {
+        assertEquals(setOf(Gesture.TEXT_VIEW, Gesture.MAP_VIEW), Gesture.values().filter { it.switchesView }.toSet())
+    }
+
+    @Test
     fun `a pinch is nothing`() {
         val tracker = twoDown()
         tracker.onMove(250f, 300f, 850f, 300f)

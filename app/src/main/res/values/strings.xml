@@ -1279,6 +1279,9 @@
     <string name="locked_gestures">Gestures while locked</string>
     <string name="locked_gestures_summary">Two-finger swipe: next or previous track. Two-finger tap: play or pause.</string>
     <string name="locked_gestures_help">While this unit is locked, swipe right with two fingers for the next track, swipe left for the previous one, or tap with two fingers to play or pause. The gestures are sent to the phone as media keys, which can only control playback; touches still never reach Android Auto. A touch with one finger does nothing.</string>
+    <string name="locked_text_view">Text view while locked</string>
+    <string name="locked_text_view_summary">Clock, next turn and track as text. Two-finger swipe up: map. Down: text.</string>
+    <string name="locked_text_view_help">While this unit is locked, it shows a text view in place of the Android Auto picture: the clock, the next turn and the playing track on a dark background. The map, saved places and Android Auto\'s pop-ups, such as a caller\'s name, are covered. Swipe up with two fingers for the map, down for the text view; the unit keeps the view used last. The swipes only change what this unit shows and send nothing to the phone. Text size, background and lines are the night overlay settings under Gestures.</string>
     <string name="relock_idle">Lock again when idle</string>
     <string name="relock_idle_summary">Locks this unit after a time without touch. The map stays visible.</string>
     <string name="relock_idle_help">An unlocked unit stays open for as long as its screen is on, and the projection keeps the screen on. With a time set here, the unit locks itself once the projection has not been touched for that long, then shows the map again in locked mode. This needs the permission to turn the screen off, and it only acts while the projection is in front.</string>

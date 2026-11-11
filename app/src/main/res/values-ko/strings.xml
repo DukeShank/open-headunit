@@ -1296,6 +1296,9 @@
     <string name="locked_gestures">잠금 중 제스처</string>
     <string name="locked_gestures_summary">두 손가락 스와이프: 다음 또는 이전 곡. 두 손가락 탭: 재생 또는 일시중지.</string>
     <string name="locked_gestures_help">이 기기가 잠겨 있는 동안 두 손가락으로 오른쪽으로 스와이프하면 다음 곡, 왼쪽으로 스와이프하면 이전 곡으로 이동하고, 두 손가락으로 탭하면 재생하거나 일시중지합니다. 제스처는 재생만 제어할 수 있는 미디어 키로 휴대전화에 전송되며, 터치는 여전히 Android Auto에 전달되지 않습니다. 한 손가락 터치는 아무 동작도 하지 않습니다.</string>
+    <string name="locked_text_view">잠금 중 텍스트 보기</string>
+    <string name="locked_text_view_summary">시계, 다음 회전, 곡을 텍스트로 표시. 두 손가락으로 위로 스와이프: 지도. 아래로: 텍스트.</string>
+    <string name="locked_text_view_help">이 기기가 잠겨 있는 동안 Android Auto 화면 대신 텍스트 보기를 표시합니다. 어두운 배경에 시계, 다음 회전, 재생 중인 곡이 나타납니다. 지도, 저장한 장소, 발신자 이름 같은 Android Auto 팝업은 가려집니다. 두 손가락으로 위로 스와이프하면 지도, 아래로 스와이프하면 텍스트 보기가 표시되며, 기기는 마지막으로 사용한 보기를 유지합니다. 스와이프는 이 기기가 표시하는 내용만 바꾸고 휴대전화로는 아무것도 보내지 않습니다. 글자 크기, 배경, 표시할 줄은 “제스처”의 야간 오버레이 설정에서 정합니다.</string>
     <string name="relock_idle">사용하지 않으면 다시 잠금</string>
     <string name="relock_idle_summary">일정 시간 터치가 없으면 이 기기를 잠급니다. 지도는 계속 표시됩니다.</string>
     <string name="relock_idle_help">잠금 해제된 기기는 화면이 켜져 있는 동안 계속 열려 있으며, 프로젝션은 화면을 켜진 상태로 유지합니다. 여기에서 시간을 설정하면 프로젝션을 그 시간 동안 터치하지 않았을 때 기기가 스스로 잠기고, 잠금 모드에서 지도를 다시 표시합니다. 화면을 끄는 권한이 필요하며 프로젝션이 앞에 있을 때만 작동합니다.</string>

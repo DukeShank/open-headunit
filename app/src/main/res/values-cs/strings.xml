@@ -1303,6 +1303,9 @@
     <string name="locked_gestures">Gesta při zamčení</string>
     <string name="locked_gestures_summary">Přejetí dvěma prsty: další nebo předchozí skladba. Klepnutí dvěma prsty: přehrát/pozastavit.</string>
     <string name="locked_gestures_help">Dokud je tato jednotka zamčená, přejeďte dvěma prsty doprava pro další skladbu, doleva pro předchozí, nebo klepněte dvěma prsty pro přehrání či pozastavení. Gesta se do telefonu posílají jako mediální klávesy, které mohou ovládat jen přehrávání; dotyky se do Android Auto stále nedostanou. Dotyk jedním prstem nedělá nic.</string>
+    <string name="locked_text_view">Textové zobrazení při zamčení</string>
+    <string name="locked_text_view_summary">Hodiny, další odbočka a skladba jako text. Přejetí dvěma prsty nahoru: mapa. Dolů: text.</string>
+    <string name="locked_text_view_help">Dokud je tato jednotka zamčená, zobrazuje místo obrazu Android Auto textové zobrazení: hodiny, další odbočku a přehrávanou skladbu na tmavém pozadí. Mapa, uložená místa a vyskakovací okna Android Auto, například jméno volajícího, jsou zakryta. Přejetím dvěma prsty nahoru zobrazíte mapu, přejetím dolů textové zobrazení; jednotka si pamatuje naposledy použité zobrazení. Přejetí mění jen to, co tato jednotka zobrazuje, a do telefonu nic neposílají. Velikost textu, pozadí a zobrazené řádky se nastavují v nastavení nočního překrytí v nabídce “Gesta”.</string>
     <string name="relock_idle">Znovu zamknout při nečinnosti</string>
     <string name="relock_idle_summary">Zamkne tuto jednotku po době bez dotyku. Mapa zůstane viditelná.</string>
     <string name="relock_idle_help">Odemčená jednotka zůstává otevřená, dokud svítí obrazovka, a projekce nechává obrazovku zapnutou. Je-li zde nastaven čas, jednotka se sama zamkne, jakmile se projekce po tuto dobu nikdo nedotkl, a pak znovu zobrazí mapu v zamčeném režimu. Je k tomu potřeba oprávnění vypínat obrazovku a funguje to jen tehdy, když je projekce v popředí.</string>

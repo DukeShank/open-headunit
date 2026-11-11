@@ -1296,6 +1296,9 @@
     <string name="locked_gestures">Kilitliyken hareketler</string>
     <string name="locked_gestures_summary">İki parmakla kaydırma: sonraki veya önceki parça. İki parmakla dokunma: oynat/duraklat.</string>
     <string name="locked_gestures_help">Bu cihaz kilitliyken sonraki parça için iki parmakla sağa, önceki parça için sola kaydırın veya oynatmak ya da duraklatmak için iki parmakla dokunun. Hareketler telefona yalnızca oynatmayı kontrol edebilen medya tuşları olarak gönderilir; dokunmalar yine Android Auto\'ya ulaşmaz. Tek parmakla dokunmak hiçbir şey yapmaz.</string>
+    <string name="locked_text_view">Kilitliyken metin görünümü</string>
+    <string name="locked_text_view_summary">Saat, sonraki dönüş ve parça metin olarak. İki parmakla yukarı kaydırma: harita. Aşağı: metin.</string>
+    <string name="locked_text_view_help">Bu cihaz kilitliyken Android Auto görüntüsü yerine bir metin görünümü gösterir: koyu arka planda saat, sonraki dönüş ve çalan parça. Harita, kayıtlı yerler ve arayanın adı gibi Android Auto açılır pencereleri örtülür. Harita için iki parmakla yukarı, metin görünümü için aşağı kaydırın; cihaz son kullanılan görünümü korur. Kaydırmalar yalnızca bu cihazın gösterdiğini değiştirir ve telefona hiçbir şey göndermez. Metin boyutu, arka plan ve gösterilen satırlar “Hareketler” menüsündeki gece katmanı ayarlarıdır.</string>
     <string name="relock_idle">Boştayken yeniden kilitle</string>
     <string name="relock_idle_summary">Dokunulmadan geçen sürenin ardından cihazı kilitler. Harita görünür kalır.</string>
     <string name="relock_idle_help">Kilidi açılmış bir cihaz, ekranı açık olduğu sürece açık kalır ve yansıtma ekranı açık tutar. Burada bir süre ayarlanırsa, yansıtmaya bu süre boyunca dokunulmadığında cihaz kendini kilitler ve ardından haritayı kilitli modda yeniden gösterir. Bunun için ekranı kapatma izni gerekir ve yalnızca yansıtma öndeyken çalışır.</string>

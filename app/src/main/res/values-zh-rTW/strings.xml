@@ -1299,6 +1299,9 @@
     <string name="locked_gestures">鎖定時的手勢</string>
     <string name="locked_gestures_summary">雙指滑動：下一首或上一首。雙指輕觸：播放或暫停。</string>
     <string name="locked_gestures_help">此裝置鎖定期間，雙指向右滑動可切換到下一首，向左滑動可回到上一首，雙指輕觸可播放或暫停。這些手勢會以媒體按鍵的形式傳送到手機，只能控制播放；觸控仍然不會傳到 Android Auto。單指觸控沒有任何作用。</string>
+    <string name="locked_text_view">鎖定時的文字檢視</string>
+    <string name="locked_text_view_summary">以文字顯示時鐘、下一個轉彎和曲目。雙指上滑：地圖。下滑：文字。</string>
+    <string name="locked_text_view_help">此裝置鎖定期間，會以文字檢視取代 Android Auto 畫面：在深色背景上顯示時鐘、下一個轉彎和正在播放的曲目。地圖、已儲存的地點以及 Android Auto 的彈出提示（例如來電者姓名）會被遮住。雙指向上滑動顯示地圖，向下滑動回到文字檢視；裝置會保留上次使用的檢視。這些滑動只改變此裝置顯示的內容，不會傳送任何資訊到手機。文字大小、背景和顯示的行由“手勢”中的夜間覆蓋層設定決定。</string>
     <string name="relock_idle">閒置時重新鎖定</string>
     <string name="relock_idle_summary">一段時間沒有觸控後鎖定此裝置。地圖維持顯示。</string>
     <string name="relock_idle_help">已解鎖的裝置在螢幕亮著時會一直保持開啟，而投影畫面會讓螢幕保持恆亮。在這裡設定時間後，投影畫面在這段時間內沒有被觸控時，裝置會自行鎖定，然後在鎖定模式下重新顯示地圖。此功能需要關閉螢幕的權限，而且只在投影畫面位於前景時生效。</string>

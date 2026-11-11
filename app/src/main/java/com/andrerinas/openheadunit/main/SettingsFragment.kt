@@ -273,6 +273,7 @@ class SettingsFragment : Fragment() {
     private var pendingRaiseProjectionDuringCall by pending::raiseProjectionDuringCall
     private var pendingShowOverLockScreen by pending::showOverLockScreen
     private var pendingLockedGestures by pending::lockedGestures
+    private var pendingLockedTextView by pending::lockedTextView
     private var pendingRelockIdleSeconds by pending::relockIdleSeconds
 
     // Custom Insets
@@ -700,6 +701,13 @@ class SettingsFragment : Fragment() {
         pendingRaiseProjectionDuringCall?.let { if (it != settings.raiseProjectionDuringCall) settings.raiseProjectionDuringCall = it }
         pendingShowOverLockScreen?.let { if (it != settings.showOverLockScreen) settings.showOverLockScreen = it }
         pendingLockedGestures?.let { if (it != settings.lockedGestures) settings.lockedGestures = it }
+        pendingLockedTextView?.let {
+            if (it != settings.lockedTextView) {
+                settings.lockedTextView = it
+                // Newly turned on, the next lock starts in the text view.
+                if (it) settings.lockedTextChosen = true
+            }
+        }
         pendingRelockIdleSeconds?.let { if (it != settings.relockIdleSeconds) settings.relockIdleSeconds = it }
         pendingAutoEnableHotspot?.let { if (it != settings.autoEnableHotspot) settings.autoEnableHotspot = it }
         pendingAutoRestartWifi?.let { if (it != settings.autoRestartWifiWhenP2pStuck) settings.autoRestartWifiWhenP2pStuck = it }
@@ -2140,6 +2148,20 @@ class SettingsFragment : Fragment() {
                 isChecked = pendingLockedGestures ?: settings.lockedGestures,
                 onCheckedChanged = { isChecked ->
                     pendingLockedGestures = isChecked
+                    checkChanges()
+                    updateSettingsList()
+                }
+            ))
+
+            // The night overlay as the locked view: text only, no map and no Android Auto pop-ups.
+            items.add(SettingItem.ToggleSettingEntry(
+                stableId = "lockedTextView",
+                nameResId = R.string.locked_text_view,
+                descriptionResId = R.string.locked_text_view_summary,
+                helpResId = R.string.locked_text_view_help,
+                isChecked = pendingLockedTextView ?: settings.lockedTextView,
+                onCheckedChanged = { isChecked ->
+                    pendingLockedTextView = isChecked
                     checkChanges()
                     updateSettingsList()
                 }

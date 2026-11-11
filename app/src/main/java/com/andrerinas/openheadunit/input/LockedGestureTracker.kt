@@ -4,16 +4,25 @@ import kotlin.math.abs
 import kotlin.math.hypot
 
 /**
- * The two-finger gestures a locked unit still answers when "Gestures while locked" is on: a
+ * The two-finger gestures a locked unit still answers. With "Gestures while locked" on: a
  * sideways swipe for the next or previous track, a tap for play or pause. The projection screen
- * turns them into media keys, never into touches, so they can only control playback.
+ * turns them into media keys, never into touches, so they can only control playback. With "Text
+ * view while locked" on: a swipe down for the text view, a swipe up for the map. Those two change
+ * only what this unit draws, and send nothing to the phone.
  *
  * One tracker follows one touch, from the first finger down to the last finger up, and reads the
  * gesture when the first of the two fingers lifts. Plain arithmetic over positions and times, so
  * it can be unit tested.
  */
 internal class LockedGestureTracker(density: Float) {
-    enum class Gesture { NEXT_TRACK, PREVIOUS_TRACK, PLAY_PAUSE }
+    /** [switchesView] gestures choose what the locked unit shows; the others are media keys. */
+    enum class Gesture(val switchesView: Boolean) {
+        NEXT_TRACK(false),
+        PREVIOUS_TRACK(false),
+        PLAY_PAUSE(false),
+        TEXT_VIEW(true),
+        MAP_VIEW(true)
+    }
 
     private val travel = GestureDistances.travelPx(density)
     private val sideways = GestureDistances.sidewaysLimitPx(density)
@@ -82,13 +91,20 @@ internal class LockedGestureTracker(density: Float) {
         if (elapsed <= TAP_MS && hypot(dx1, dy1) <= still && hypot(dx2, dy2) <= still) {
             return Gesture.PLAY_PAUSE
         }
-        // Both fingers the same way (a pinch moves them apart), far enough, and level.
-        val sameWay = dx1 * dx2 > 0f
-        val far = abs(dx1) >= travel / 2 && abs(dx2) >= travel / 2 && abs(dx1 + dx2) / 2 >= travel
-        val level = abs(dy1) <= sideways && abs(dy2) <= sideways
-        if (elapsed > SWIPE_MS || !sameWay || !far || !level) return null
+        if (elapsed > SWIPE_MS) return null
         // Right is next, left is previous: the order of the two skip buttons.
-        return if (dx1 > 0f) Gesture.NEXT_TRACK else Gesture.PREVIOUS_TRACK
+        if (isSwipe(dx1, dx2, dy1, dy2)) return if (dx1 > 0f) Gesture.NEXT_TRACK else Gesture.PREVIOUS_TRACK
+        // Down draws the text view over the map, up takes it away again.
+        if (isSwipe(dy1, dy2, dx1, dx2)) return if (dy1 > 0f) Gesture.TEXT_VIEW else Gesture.MAP_VIEW
+        return null
+    }
+
+    /** Both fingers the same way along one axis (a pinch moves them apart), far enough, and straight. */
+    private fun isSwipe(along1: Float, along2: Float, across1: Float, across2: Float): Boolean {
+        val sameWay = along1 * along2 > 0f
+        val far = abs(along1) >= travel / 2 && abs(along2) >= travel / 2 && abs(along1 + along2) / 2 >= travel
+        val straight = abs(across1) <= sideways && abs(across2) <= sideways
+        return sameWay && far && straight
     }
 
     companion object {

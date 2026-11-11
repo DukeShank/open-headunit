@@ -1299,6 +1299,9 @@
     <string name="locked_gestures">锁定时的手势</string>
     <string name="locked_gestures_summary">双指滑动：下一首或上一首。双指点按：播放或暂停。</string>
     <string name="locked_gestures_help">此设备锁定期间，双指向右滑动切换到下一首，向左滑动回到上一首，双指点按可播放或暂停。这些手势会以媒体按键的形式发送到手机，只能控制播放；触摸仍然不会传到 Android Auto。单指触摸没有任何作用。</string>
+    <string name="locked_text_view">锁定时的文字视图</string>
+    <string name="locked_text_view_summary">以文字显示时钟、下一个转弯和曲目。双指上滑：地图。下滑：文字。</string>
+    <string name="locked_text_view_help">此设备锁定期间，会以文字视图代替 Android Auto 画面：在深色背景上显示时钟、下一个转弯和正在播放的曲目。地图、已保存的地点以及 Android Auto 的弹出提示（例如来电者姓名）会被遮住。双指向上滑动显示地图，向下滑动回到文字视图；设备会保留上次使用的视图。这些滑动只改变此设备显示的内容，不会向手机发送任何信息。文字大小、背景和显示的行由“手势”中的夜间叠加层设置决定。</string>
     <string name="relock_idle">闲置时重新锁定</string>
     <string name="relock_idle_summary">一段时间没有触摸后锁定此设备。地图保持显示。</string>
     <string name="relock_idle_help">已解锁的设备在屏幕亮着时会一直保持打开状态，而投屏画面会让屏幕保持常亮。在这里设置时间后，投屏画面在这段时间内没有被触摸时，设备会自行锁定，然后在锁定模式下重新显示地图。此功能需要关闭屏幕的权限，并且仅在投屏画面位于前台时生效。</string>
