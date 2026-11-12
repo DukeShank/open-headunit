@@ -114,6 +114,9 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     /** True while the night overlay is up because the locked unit shows its text view. */
     private var lockedViewOwnsOverlay = false
 
+    /** The "Text view while locked" setting, read when the lock state is, not on every touch event. */
+    private var lockedTextViewOn = false
+
     // "Lock again when idle": the countdown, and the screen-on that follows the lock. Its own
     // handler, because the wake has to outlive the pause that the dark screen brings.
     private val relockHandler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -1567,6 +1570,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
      */
     private fun refreshLockedInput(reason: String, screenOff: Boolean = false) {
         LockedInputPolicy.mediaKeys = settings.lockedGestures
+        lockedTextViewOn = settings.lockedTextView
         val enabled = settings.showOverLockScreen
         val deviceLocked = if (LockedInputPolicy.needsLockState(enabled, screenOff)) isDeviceLockedNow() else null
         val engage = LockedInputPolicy.shouldEngage(enabled, deviceLocked, screenOff)
@@ -1702,7 +1706,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
      * swipe down or up to change the view. One finger alone gets the "Locked" note.
      */
     private fun onLockedTouch(ev: MotionEvent) {
-        val textView = settings.lockedTextView
+        val textView = lockedTextViewOn
         if (!LockedInputPolicy.mediaKeys && !textView) {
             lockedGesture = null
             if (ev.actionMasked == MotionEvent.ACTION_DOWN) showLockedHint()
