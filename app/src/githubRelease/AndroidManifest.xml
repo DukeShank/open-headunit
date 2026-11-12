@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Personal build only (GitHub release variant); not meant for upstream.
+
+  The entries below take commands from other apps: key codes that go on to Android Auto (remote
+  control and car key receivers) and connect, disconnect, exit and similar verbs (automation
+  receiver and activity). Upstream leaves them open for steering-wheel buttons and automation
+  apps. This unit has neither, so they are limited to senders that hold android.permission.DUMP.
+  The adb shell holds it and so does the system; an ordinary installed app cannot get it. The
+  same permission guards androidx's ProfileInstallReceiver for the same reason.
+
+  Each element only adds android:permission to the entry of the same name in the main manifest.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <receiver
+            android:name="com.andrerinas.openheadunit.app.RemoteControlReceiver"
+            android:permission="android.permission.DUMP" />
+        <receiver
+            android:name="com.andrerinas.openheadunit.connection.carkey.CarKeyBroadcastReceiver"
+            android:permission="android.permission.DUMP" />
+        <receiver
+            android:name="com.andrerinas.openheadunit.automation.AutomationReceiver"
+            android:permission="android.permission.DUMP" />
+        <activity
+            android:name="com.andrerinas.openheadunit.main.AutomationActivity"
+            android:permission="android.permission.DUMP" />
+    </application>
+</manifest>
