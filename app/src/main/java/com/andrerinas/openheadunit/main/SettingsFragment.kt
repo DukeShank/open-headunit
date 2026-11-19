@@ -278,6 +278,7 @@ class SettingsFragment : Fragment() {
     private var pendingAutoKillOemApps by pending::autoKillOemApps
     private var pendingRaiseProjectionDuringCall by pending::raiseProjectionDuringCall
     private var pendingShowOverLockScreen by pending::showOverLockScreen
+    private var pendingNightOverlayWhileLocked by pending::nightOverlayWhileLocked
     private var pendingLockedGestures by pending::lockedGestures
     private var pendingRelockIdleSeconds by pending::relockIdleSeconds
 
@@ -707,6 +708,7 @@ class SettingsFragment : Fragment() {
         pendingAutoKillOemApps?.let { if (it != settings.autoKillOemApps) settings.autoKillOemApps = it }
         pendingRaiseProjectionDuringCall?.let { if (it != settings.raiseProjectionDuringCall) settings.raiseProjectionDuringCall = it }
         pendingShowOverLockScreen?.let { if (it != settings.showOverLockScreen) settings.showOverLockScreen = it }
+        pendingNightOverlayWhileLocked?.let { if (it != settings.nightOverlayWhileLocked) settings.nightOverlayWhileLocked = it }
         pendingLockedGestures?.let { if (it != settings.lockedGestures) settings.lockedGestures = it }
         pendingRelockIdleSeconds?.let { if (it != settings.relockIdleSeconds) settings.relockIdleSeconds = it }
         pendingAutoEnableHotspot?.let { if (it != settings.autoEnableHotspot) settings.autoEnableHotspot = it }
@@ -2180,6 +2182,20 @@ class SettingsFragment : Fragment() {
 
         // What a locked unit may still do. Only offered while the projection shows over the lock screen.
         if (pendingShowOverLockScreen ?: settings.showOverLockScreen) {
+            // The night overlay in place of the picture: no map, no saved places, no pop-ups.
+            items.add(SettingItem.ToggleSettingEntry(
+                stableId = "nightOverlayWhileLocked",
+                nameResId = R.string.night_overlay_while_locked,
+                descriptionResId = R.string.night_overlay_while_locked_summary,
+                helpResId = R.string.night_overlay_while_locked_help,
+                isChecked = pendingNightOverlayWhileLocked ?: settings.nightOverlayWhileLocked,
+                onCheckedChanged = { isChecked ->
+                    pendingNightOverlayWhileLocked = isChecked
+                    checkChanges()
+                    updateSettingsList()
+                }
+            ))
+
             items.add(SettingItem.ToggleSettingEntry(
                 stableId = "lockedGestures",
                 nameResId = R.string.locked_gestures,

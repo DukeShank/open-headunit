@@ -54,6 +54,7 @@ import com.andrerinas.openheadunit.decoder.video.VideoDimensionsListener
 import com.andrerinas.openheadunit.utils.AppLog
 import com.andrerinas.openheadunit.utils.ScreenPower
 import com.andrerinas.openheadunit.input.LockedInputPolicy
+import com.andrerinas.openheadunit.input.LockedViewPolicy
 import com.andrerinas.openheadunit.input.LockedGestureTracker
 import com.andrerinas.openheadunit.input.LockedGestureFeed
 import com.andrerinas.openheadunit.input.IdleRelockPolicy
@@ -203,6 +204,8 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     private var activityFullscreenOverride: Settings.FullscreenMode? = null
     private var touchOverlayView: OverlayTouchView? = null
     private var nightOverlay: NightProjectionOverlay? = null
+    /** True while the night overlay is up because "Night overlay while locked" put it up. */
+    private var lockedUnitOwnsOverlay = false
     private var dimmerView: ProjectionDimmerView? = null
     private val performanceOverlay by lazy {
         PerformanceOverlay(settings) { videoDecoder.lastFrameRenderedMs }
@@ -1358,6 +1361,8 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         placeDimmer()
         // The overlay is built hidden, so one lost to a recreation counts as closed.
         commManager.dimState.resumeAfterOverlay()
+        // A screen rebuilt on a locked unit goes back to the locked unit's view.
+        syncLockedView()
         overlayView.requestFocus()
         setFullscreen() // Call setFullscreen here as well
 
@@ -1590,6 +1595,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         LockedInputPolicy.engaged = engage
         AppLog.i("AapProjectionActivity: locked-unit input hold ${if (engage) "on" else "off"} ($reason)")
         if (!engage) {
+            syncLockedView()
             armIdleRelock()
             return
         }
@@ -1602,6 +1608,36 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         // Straight to the transport, past the keymap: this is Android Auto's own map key.
         commManager.send(LockedInputPolicy.KEYCODE_AA_NAVIGATION, true)
         commManager.send(LockedInputPolicy.KEYCODE_AA_NAVIGATION, false)
+        syncLockedView()
+    }
+
+    /**
+     * Puts the night overlay up or takes it away so a locked unit shows what "Night overlay while
+     * locked" asks for. Safe to call at any time; it does nothing before the overlay exists.
+     */
+    private fun syncLockedView() {
+        val overlay = nightOverlay ?: return
+        // The overlay's clock needs the window's handler: before the screen is attached, try again once it is.
+        if (overlay.windowToken == null) {
+            overlay.post { syncLockedView() }
+            return
+        }
+        val visible = overlay.visibility == View.VISIBLE
+        if (!visible) lockedUnitOwnsOverlay = false
+        when (LockedViewPolicy.decide(LockedInputPolicy.engaged, settings.nightOverlayWhileLocked,
+            visible, lockedUnitOwnsOverlay)) {
+            LockedViewPolicy.Step.SHOW -> {
+                showNightOverlay()
+                lockedUnitOwnsOverlay = true
+                AppLog.i("AapProjectionActivity: locked unit shows the night overlay")
+            }
+            LockedViewPolicy.Step.HIDE -> {
+                overlay.hide()
+                lockedUnitOwnsOverlay = false
+                AppLog.i("AapProjectionActivity: locked unit shows the picture again")
+            }
+            LockedViewPolicy.Step.KEEP -> Unit
+        }
     }
 
     /** Restarts the countdown of "Lock again when idle", or stops it when it should not run. */
@@ -2652,20 +2688,25 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             true
         }
         GestureOutcomePolicy.Outcome.ShowOverlay -> {
-            commManager.dimState.suspendForOverlay()
-            nightOverlay?.apply {
-                applyOptions(NightOverlayOptions(
-                    textSize = settings.nightOverlayTextSize,
-                    background = settings.nightOverlayBackground,
-                    showClock = settings.nightOverlayShowClock,
-                    showNavigation = settings.nightOverlayShowNavigation,
-                    showTrack = settings.nightOverlayShowTrack
-                ))
-                render(App.provide(this@AapProjectionActivity).nightOverlayState.content.value)
-                scaleX = if (settings.hudMirroring) -1f else 1f
-                show()
-            }
+            showNightOverlay()
             true
+        }
+    }
+
+    /** Puts the night overlay up with the current settings; the gesture action and the locked unit share it. */
+    private fun showNightOverlay() {
+        commManager.dimState.suspendForOverlay()
+        nightOverlay?.apply {
+            applyOptions(NightOverlayOptions(
+                textSize = settings.nightOverlayTextSize,
+                background = settings.nightOverlayBackground,
+                showClock = settings.nightOverlayShowClock,
+                showNavigation = settings.nightOverlayShowNavigation,
+                showTrack = settings.nightOverlayShowTrack
+            ))
+            render(App.provide(this@AapProjectionActivity).nightOverlayState.content.value)
+            scaleX = if (settings.hudMirroring) -1f else 1f
+            show()
         }
     }
 

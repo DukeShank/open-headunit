@@ -303,6 +303,17 @@ class Settings(private val context: Context) {
         }
 
     /**
+     * With [showOverLockScreen] on, a locked unit shows the night overlay (clock, next turn and
+     * playing track as text) in place of the projection; see
+     * [com.andrerinas.openheadunit.input.LockedViewPolicy]. Off by default.
+     */
+    var nightOverlayWhileLocked: Boolean
+        get() = prefs.getBoolean("night-overlay-while-locked", false)
+        set(value) {
+            prefs.edit().putBoolean("night-overlay-while-locked", value).apply()
+        }
+
+    /**
      * Two-finger gestures on a locked unit shown over the lock screen: swipe for the next or
      * previous track, tap for play or pause. They are sent as media keys, never as touches; see
      * [com.andrerinas.openheadunit.input.LockedGestureTracker]. Off by default.
