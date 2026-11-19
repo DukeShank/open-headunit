@@ -206,6 +206,9 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
     private var nightOverlay: NightProjectionOverlay? = null
     /** True while the night overlay is up because "Night overlay while locked" put it up. */
     private var lockedUnitOwnsOverlay = false
+
+    /** The "Night overlay while locked" setting, read when the lock state is, not on every touch event. */
+    private var nightOverlayWhileLockedOn = false
     private var dimmerView: ProjectionDimmerView? = null
     private val performanceOverlay by lazy {
         PerformanceOverlay(settings) { videoDecoder.lastFrameRenderedMs }
@@ -1588,6 +1591,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
      */
     private fun refreshLockedInput(reason: String, screenOff: Boolean = false) {
         LockedInputPolicy.mediaKeys = settings.lockedGestures
+        nightOverlayWhileLockedOn = settings.nightOverlayWhileLocked
         val enabled = settings.showOverLockScreen
         val deviceLocked = if (LockedInputPolicy.needsLockState(enabled, screenOff)) isDeviceLockedNow() else null
         val engage = LockedInputPolicy.shouldEngage(enabled, deviceLocked, screenOff)
@@ -1625,7 +1629,7 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
         val visible = overlay.visibility == View.VISIBLE
         if (!visible) lockedUnitOwnsOverlay = false
         when (LockedViewPolicy.decide(LockedInputPolicy.engaged, settings.nightOverlayWhileLocked,
-            visible, lockedUnitOwnsOverlay)) {
+            visible, lockedUnitOwnsOverlay, settings.lockedOverlayChosen)) {
             LockedViewPolicy.Step.SHOW -> {
                 showNightOverlay()
                 lockedUnitOwnsOverlay = true
@@ -1638,6 +1642,12 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             }
             LockedViewPolicy.Step.KEEP -> Unit
         }
+    }
+
+    /** A swipe on the locked unit chose the night overlay or the map; the choice is kept for the next lock. */
+    private fun chooseLockedView(overlay: Boolean) {
+        settings.lockedOverlayChosen = overlay
+        syncLockedView()
     }
 
     /** Restarts the countdown of "Lock again when idle", or stops it when it should not run. */
@@ -1714,10 +1724,12 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
 
     /**
      * A touch on a locked unit. Nothing of it goes to the phone. With "Gestures while locked" on,
-     * two fingers can swipe or tap for the media keys; one finger alone gets the "Locked" note.
+     * two fingers can swipe or tap for the media keys; with "Night overlay while locked" on, they
+     * can swipe down or up to change the view. One finger alone gets the "Locked" note.
      */
     private fun onLockedTouch(ev: MotionEvent) {
-        if (!LockedInputPolicy.mediaKeys) {
+        val overlaySwipes = nightOverlayWhileLockedOn
+        if (!LockedInputPolicy.mediaKeys && !overlaySwipes) {
             lockedGesture = null
             if (ev.actionMasked == MotionEvent.ACTION_DOWN) showLockedHint()
             return
@@ -1732,24 +1744,25 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
             MotionEvent.ACTION_CANCEL -> lockedGesture = null
             else -> {
                 // The feed reads the fingers; this screen reads coordinates only in the overlay's frame.
-                val tracker = lockedGesture
-                val gesture = if (tracker != null) LockedGestureFeed.feed(tracker, ev) else null
-                if (gesture != null) performLockedGesture(gesture)
+                val tracker = lockedGesture ?: return
+                val gesture = LockedGestureFeed.feed(tracker, ev) ?: return
+                if (gesture.switchesView) {
+                    if (overlaySwipes) chooseLockedView(overlay = gesture == LockedGestureTracker.Gesture.NIGHT_OVERLAY)
+                } else if (LockedInputPolicy.mediaKeys) {
+                    performLockedGesture(gesture)
+                }
             }
         }
     }
 
     /** Sends the media key of a locked-unit gesture and names it in a short note. */
     private fun performLockedGesture(gesture: LockedGestureTracker.Gesture) {
-        val keyCode = when (gesture) {
-            LockedGestureTracker.Gesture.NEXT_TRACK -> KeyEvent.KEYCODE_MEDIA_NEXT
-            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> KeyEvent.KEYCODE_MEDIA_PREVIOUS
-            LockedGestureTracker.Gesture.PLAY_PAUSE -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-        }
-        val label = when (gesture) {
-            LockedGestureTracker.Gesture.NEXT_TRACK -> R.string.key_media_next
-            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> R.string.key_media_prev
-            LockedGestureTracker.Gesture.PLAY_PAUSE -> R.string.key_media_play_pause
+        val (keyCode, label) = when (gesture) {
+            LockedGestureTracker.Gesture.NEXT_TRACK -> KeyEvent.KEYCODE_MEDIA_NEXT to R.string.key_media_next
+            LockedGestureTracker.Gesture.PREVIOUS_TRACK -> KeyEvent.KEYCODE_MEDIA_PREVIOUS to R.string.key_media_prev
+            LockedGestureTracker.Gesture.PLAY_PAUSE -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE to R.string.key_media_play_pause
+            // The view gestures are no keys; onLockedTouch handles them.
+            LockedGestureTracker.Gesture.NIGHT_OVERLAY, LockedGestureTracker.Gesture.MAP -> return
         }
         AppLog.i("AapProjectionActivity: locked-unit gesture $gesture")
         // Straight to the transport, past the keymap: a gesture is not a learned hardware key.

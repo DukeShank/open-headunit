@@ -314,6 +314,16 @@ class Settings(private val context: Context) {
         }
 
     /**
+     * The view a locked unit chose last by a two-finger swipe: true for the night overlay (swipe
+     * down), false for the map (swipe up). Kept for the next lock; runtime state, not backed up.
+     */
+    var lockedOverlayChosen: Boolean
+        get() = prefs.getBoolean("locked-overlay-chosen", true)
+        set(value) {
+            prefs.edit().putBoolean("locked-overlay-chosen", value).apply()
+        }
+
+    /**
      * Two-finger gestures on a locked unit shown over the lock screen: swipe for the next or
      * previous track, tap for play or pause. They are sent as media keys, never as touches; see
      * [com.andrerinas.openheadunit.input.LockedGestureTracker]. Off by default.

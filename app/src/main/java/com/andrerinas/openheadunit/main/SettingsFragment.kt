@@ -708,7 +708,13 @@ class SettingsFragment : Fragment() {
         pendingAutoKillOemApps?.let { if (it != settings.autoKillOemApps) settings.autoKillOemApps = it }
         pendingRaiseProjectionDuringCall?.let { if (it != settings.raiseProjectionDuringCall) settings.raiseProjectionDuringCall = it }
         pendingShowOverLockScreen?.let { if (it != settings.showOverLockScreen) settings.showOverLockScreen = it }
-        pendingNightOverlayWhileLocked?.let { if (it != settings.nightOverlayWhileLocked) settings.nightOverlayWhileLocked = it }
+        pendingNightOverlayWhileLocked?.let {
+            if (it != settings.nightOverlayWhileLocked) {
+                settings.nightOverlayWhileLocked = it
+                // Newly turned on, the next lock starts with the overlay.
+                if (it) settings.lockedOverlayChosen = true
+            }
+        }
         pendingLockedGestures?.let { if (it != settings.lockedGestures) settings.lockedGestures = it }
         pendingRelockIdleSeconds?.let { if (it != settings.relockIdleSeconds) settings.relockIdleSeconds = it }
         pendingAutoEnableHotspot?.let { if (it != settings.autoEnableHotspot) settings.autoEnableHotspot = it }

@@ -18,12 +18,22 @@ object LockedViewPolicy {
      * @param overlayVisible the night overlay is up now.
      * @param ownsOverlay    the locked unit put the overlay up, rather than the "Night overlay"
      *                       gesture action of the unlocked projection.
+     * @param overlayChosen  the view chosen last by a two-finger swipe on the locked unit: true for
+     *                       the overlay (swipe down), false for the map (swipe up).
      *
      * Unlocked, or with the setting off, only an overlay the locked unit put up is taken away: one
      * opened by the gesture action keeps its own tap to close.
      */
-    fun decide(engaged: Boolean, enabled: Boolean, overlayVisible: Boolean, ownsOverlay: Boolean): Step = when {
-        engaged && enabled -> if (overlayVisible) Step.KEEP else Step.SHOW
+    fun decide(
+        engaged: Boolean,
+        enabled: Boolean,
+        overlayVisible: Boolean,
+        ownsOverlay: Boolean,
+        overlayChosen: Boolean = true
+    ): Step = when {
+        engaged && enabled && overlayChosen -> if (overlayVisible) Step.KEEP else Step.SHOW
+        // The map was chosen by a swipe: any overlay goes, also one the gesture action opened.
+        engaged && enabled -> if (overlayVisible) Step.HIDE else Step.KEEP
         ownsOverlay && overlayVisible -> Step.HIDE
         else -> Step.KEEP
     }

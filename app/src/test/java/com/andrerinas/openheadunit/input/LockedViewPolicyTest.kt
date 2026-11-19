@@ -39,6 +39,19 @@ class LockedViewPolicyTest {
     }
 
     @Test
+    fun `a swipe up to the map takes any overlay away`() {
+        assertEquals(Step.HIDE, LockedViewPolicy.decide(engaged = true, enabled = true, overlayVisible = true, ownsOverlay = true, overlayChosen = false))
+        assertEquals(Step.HIDE, LockedViewPolicy.decide(engaged = true, enabled = true, overlayVisible = true, ownsOverlay = false, overlayChosen = false))
+        assertEquals(Step.KEEP, LockedViewPolicy.decide(engaged = true, enabled = true, overlayVisible = false, ownsOverlay = false, overlayChosen = false))
+    }
+
+    @Test
+    fun `the map chosen while locked does not matter once unlocked`() {
+        assertEquals(Step.HIDE, LockedViewPolicy.decide(engaged = false, enabled = true, overlayVisible = true, ownsOverlay = true, overlayChosen = false))
+        assertEquals(Step.KEEP, LockedViewPolicy.decide(engaged = false, enabled = true, overlayVisible = true, ownsOverlay = false, overlayChosen = false))
+    }
+
+    @Test
     fun `unlocked with nothing up, nothing happens`() {
         assertEquals(Step.KEEP, LockedViewPolicy.decide(engaged = false, enabled = true, overlayVisible = false, ownsOverlay = false))
         assertEquals(Step.KEEP, LockedViewPolicy.decide(engaged = false, enabled = false, overlayVisible = false, ownsOverlay = false))
