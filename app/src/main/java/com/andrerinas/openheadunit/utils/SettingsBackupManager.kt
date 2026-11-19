@@ -61,6 +61,9 @@ object SettingsBackupManager {
         "ui-scale-exit-dialog-percent" to ValueType.INT,
         Settings.KEY_AUTO_RESUME_PLAYBACK_ON_RECONNECT to ValueType.BOOLEAN,
         "raise-projection-during-call" to ValueType.BOOLEAN,
+        "locked-gestures" to ValueType.BOOLEAN,
+        // Seconds; IdleRelockPolicy.normalize maps any other stored value to the nearest choice below.
+        "relock-idle-seconds" to ValueType.INT,
         "car-signal-invert" to ValueType.BOOLEAN,
         "dpi-floor-override" to ValueType.BOOLEAN,
         "auto-restart-wifi-p2p-stuck" to ValueType.BOOLEAN,
