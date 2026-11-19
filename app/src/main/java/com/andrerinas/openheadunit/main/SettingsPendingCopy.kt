@@ -102,6 +102,7 @@ class SettingsPendingCopy {
     var raiseProjectionDuringCall: Boolean? = null
     var showOverLockScreen: Boolean? = null
     var lockedGestures: Boolean? = null
+    var relockIdleSeconds: Int? = null
     var insetLeft: Int? = null
     var insetTop: Int? = null
     var insetRight: Int? = null
@@ -200,6 +201,7 @@ class SettingsPendingCopy {
         raiseProjectionDuringCall = settings.raiseProjectionDuringCall
         showOverLockScreen = settings.showOverLockScreen
         lockedGestures = settings.lockedGestures
+        relockIdleSeconds = settings.relockIdleSeconds
         insetLeft = settings.insetLeft
         insetTop = settings.insetTop
         insetRight = settings.insetRight
@@ -299,6 +301,7 @@ class SettingsPendingCopy {
         raiseProjectionDuringCall != settings.raiseProjectionDuringCall ||
         showOverLockScreen != settings.showOverLockScreen ||
         lockedGestures != settings.lockedGestures ||
+        relockIdleSeconds != settings.relockIdleSeconds ||
         insetLeft != settings.insetLeft ||
         insetTop != settings.insetTop ||
         insetRight != settings.insetRight ||
