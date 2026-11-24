@@ -1621,11 +1621,6 @@ class AapProjectionActivity : SurfaceActivity(), IProjectionView.Callbacks, Vide
      */
     private fun syncLockedView() {
         val overlay = nightOverlay ?: return
-        // The overlay's clock needs the window's handler: before the screen is attached, try again once it is.
-        if (overlay.windowToken == null) {
-            overlay.post { syncLockedView() }
-            return
-        }
         val visible = overlay.visibility == View.VISIBLE
         if (!visible) lockedUnitOwnsOverlay = false
         when (LockedViewPolicy.decide(LockedInputPolicy.engaged, settings.nightOverlayWhileLocked,
